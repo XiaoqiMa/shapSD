@@ -1,7 +1,6 @@
 import unittest
 from shapSD.encoding import *
 
-
 class TestEncoding(unittest.TestCase):
 
     @staticmethod
