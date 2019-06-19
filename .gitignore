@@ -1,0 +1,9 @@
+# Ignore the following files
+ 
+**/*.ipynb_checkpoints/*.ipynb
+__pycache__
+.idea
+doc/_build
+.ipynb_checkpoints
+build
+venv
