@@ -1,5 +1,6 @@
 from shapSD.encoding import *
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+# import xgboost as xgb
 
 
 def read_data(file_path):
@@ -16,7 +17,26 @@ def get_data(file_path):
     return X_train, y
 
 
-def train_rf_model(X_train, y):
-    model = RandomForestClassifier(random_state=0, n_estimators=10)
+def rf_clf_model(X_train, y, **kwargs):
+    model = RandomForestClassifier(random_state=0, n_estimators=20, **kwargs)
     model.fit(X_train, y)
     return model
+
+
+def rf_reg_model(X_train, y, **kwargs):
+    model = RandomForestRegressor(random_state=0, n_estimators=20, **kwargs)
+    model.fit(X_train, y)
+    return model
+
+
+# def xgb_clf_model(X_train, y, **kwargs):
+#     xgc = xgb.XGBClassifier(n_estimators=50, max_depth=20, base_score=0.5,
+#                             objective='binary:logistic', random_state=42, **kwargs)
+#     xgc.fit(X_train, y)
+#     return xgc
+#
+#
+# def xgb_reg_model(X_train, y, **kwargs):
+#     xgr = xgb.XGBRegressor(n_estimators=50, max_depth=20, base_score=0.5, random_state=42)
+#     xgr.fit(X_train, y)
+#     return xgr
