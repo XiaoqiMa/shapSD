@@ -1,17 +1,17 @@
 import numpy as np
-import pandas as pd
 import eli5
 from eli5.sklearn import PermutationImportance
-from sklearn.metrics import mean_squared_error
 
 from shapSD.log_execution_time import *
 from shapSD.model_init import *
+from shapSD.utils import *
+
 
 @func_logging
-def raw_perm_importance(X_train, y_train, model, is_classification=True, iteration=10):
+def raw_perm_importance(X_train, y_train, model, iteration=10):
     imp = []
     imp_var = []
-    if is_classification:
+    try:
         base_score = model.score(X_train, y_train)
         for col in X_train.columns:
             scores = []
@@ -25,35 +25,44 @@ def raw_perm_importance(X_train, y_train, model, is_classification=True, iterati
             score_mean_drop = np.round(np.mean(score_drop_list), 4)
             imp.append(score_mean_drop)
             imp_var.append('{}±{}'.format(score_mean_drop, variance))
-    else:
-        y_pred = model.predict(X_train)
-        base_rmse = mean_squared_error(y_train, y_pred)
-        for col in X_train.columns:
-            scores = []
-            for m in range(iteration):
-                x = X_train.copy()
-                x[col] = np.random.permutation(x[col])
-                pred = model.predict(x)
-                rmse_score = mean_squared_error(y_train, pred)
-                scores.append(rmse_score)
-            rmse_score_list = np.array(base_rmse) - np.array(scores)
-            rmse_variance = np.round(np.var(rmse_score_list), 6)
-            rmse_mean = np.round(np.mean(rmse_score_list), 4)
-            imp.append(rmse_mean)
-            imp_var.append('{}±{}'.format(rmse_mean, rmse_variance))
 
-    df_imp = pd.DataFrame({'Features': X_train.columns, 'Importance': imp, 'Importance weights': imp_var})
-    df_imp = df_imp.sort_values('Importance', ascending=False)
-    return df_imp[['Importance weights', 'Features']]
+        df_imp = pd.DataFrame({'Features': X_train.columns, 'Importance': imp, 'Importance weights': imp_var})
+        df_imp = df_imp.sort_values('Importance', ascending=False)
+        return df_imp[['Importance weights', 'Features']]
+    except:
+        print('Error: model is not supported')
 
 @func_logging
-def eli5_perm_importance(X_train, y_train, model, is_classification=True):
-    if is_classification:
-        perm = PermutationImportance(model, random_state=0).fit(X_train, y_train)
-        return eli5.show_weights(perm, feature_names=X_train.columns.tolist())
+def eli5_perm_importance(X_train, y_train, model, **kwargs):
+    perm = PermutationImportance(model).fit(X_train, y_train)
+    return eli5.show_weights(perm, feature_names=X_train.columns.tolist(), **kwargs)
 
-file_path = '../data/adult.csv'
-X_train, y = get_data(file_path)
-model = train_rf_model(X_train, y)
-# print(raw_perm_importance(X_train, y, model))
-print(eli5_perm_importance(X_train, y, model))
+
+def eli5_weights_importance(X_train, model, **kwargs):
+    """By default, “gain” is used, that is the average gain of the feature when it is used in trees.
+    Other types are “weight” - the number of times a feature is used to split the data,
+    “cover” - the average coverage of the feature.
+    You can pass it with `importance_type` argument"""
+
+    try:
+        weights = eli5.show_weights(model, feature_names=list(X_train.columns), **kwargs)
+        return weights
+    except:
+        print('Error: model is not supported')
+
+
+def eli5_instance_importance(X_train, instance, model, **kwargs):
+    try:
+        prediction = eli5.show_prediction(model, instance, show_feature_values=True,
+                                          feature_names=list(X_train.columns), **kwargs)
+        return prediction
+    except:
+        print('Error: model is not supported')
+
+# if __name__ == '__main__':
+#     file_path = '../data/adult.csv'
+#     X_train, y = get_data(file_path)
+#     model = rf_clf_model(X_train, y)
+#     # raw_perm_importance(X_train, y, model)
+#     imp = eli5_perm_importance(X_train, y, model)
+#     save_file(imp.data, 'eli5_importance.html')
