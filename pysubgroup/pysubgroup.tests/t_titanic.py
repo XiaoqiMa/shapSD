@@ -1,4 +1,4 @@
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 import pandas as pd
 data = pd.read_table("../data/titanic.csv")
 target = ps.NominalTarget('Survived', True)

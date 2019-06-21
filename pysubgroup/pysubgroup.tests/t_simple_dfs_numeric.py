@@ -1,4 +1,4 @@
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 import pandas as pd
 from scipy.io import arff
 from timeit import default_timer as timer

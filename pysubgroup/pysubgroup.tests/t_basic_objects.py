@@ -4,7 +4,7 @@ Created on 10.05.2017
 @author: lemmerfn
 '''
 import pandas as pd
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 
 
 data = pd.read_csv("../data/titanic.csv")

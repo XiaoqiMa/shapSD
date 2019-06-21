@@ -1,6 +1,6 @@
 from scipy.io import arff
 
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 import pandas as pd
 from timeit import default_timer as timer
 

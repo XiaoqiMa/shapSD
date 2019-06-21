@@ -1,6 +1,6 @@
 from scipy.io import arff
 
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 import pandas as pd
 
 data = pd.DataFrame (arff.loadarff("../data/credit-g.arff") [0])
