@@ -1,7 +1,7 @@
 import shap
 import numpy as np
 from shapSD.utils import *
-from shapSD.log_execution_time import *
+from shapSD.logging_custom import *
 
 
 def calc_shap_values(X_train, model, **kwargs):
@@ -17,7 +17,8 @@ def calc_shap_values(X_train, model, **kwargs):
         return explainer, shap_v, expected_v
     except Exception as err:
         print('Error: model is not supported by SHAP TreeExplainer')
-        print(err)
+        err_logging(err)
+        raise Exception(err)
 
 
 def calc_shap_inter_values(X_train, model, **kwargs):
@@ -33,10 +34,11 @@ def calc_shap_inter_values(X_train, model, **kwargs):
         return explainer, shap_inter, expected_v
     except Exception as err:
         print('Error: model is not supported by SHAP TreeExplainer')
-        print(err)
+        err_logging(err)
+        raise Exception(err)
 
 
-@func_logging
+@execution_time_logging
 def shap_force_plot(X_trian, model, instance_ind=None, instance_interval=None, **kwargs):
     try:
         explainer, shap_values, expected_value = calc_shap_values(X_trian, model, **kwargs)
@@ -53,10 +55,11 @@ def shap_force_plot(X_trian, model, instance_ind=None, instance_interval=None, *
         return shap.force_plot(expected_value, shap_values, X_trian, **kwargs)
     except Exception as err:
         print('Error: model is not supported by SHAP force plot')
-        print(err)
+        err_logging(err)
+        raise Exception(err)
 
 
-@func_logging
+@execution_time_logging
 def shap_summary_plot(X_train, model, plot_type='dot', interaction=False, **kwargs):
     try:
         if not interaction:
@@ -71,10 +74,11 @@ def shap_summary_plot(X_train, model, plot_type='dot', interaction=False, **kwar
             return
     except Exception as err:
         print('Error: model is not supported by SHAP summary plot')
-        print(err)
+        err_logging(err)
+        raise Exception(err)
 
 
-@func_logging
+@execution_time_logging
 def shap_dependence_plot(X_train, model, ind, interaction_index, interaction=False, **kwargs):
     try:
         if not interaction:
@@ -97,4 +101,6 @@ def shap_dependence_plot(X_train, model, ind, interaction_index, interaction=Fal
 
     except Exception as err:
         print('Error: model is not supported by SHAP dependence plot')
-        print(err)
+        err_logging(err)
+        raise Exception(err)
+

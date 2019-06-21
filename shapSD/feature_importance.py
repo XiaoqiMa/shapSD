@@ -2,12 +2,12 @@ import numpy as np
 import eli5
 from eli5.sklearn import PermutationImportance
 
-from shapSD.log_execution_time import *
+from shapSD.logging_custom import *
 from shapSD.model_init import *
 from shapSD.utils import *
 
 
-@func_logging
+@execution_time_logging
 def raw_perm_importance(X_train, y_train, model, iteration=10):
     imp = []
     imp_var = []
@@ -29,10 +29,12 @@ def raw_perm_importance(X_train, y_train, model, iteration=10):
         df_imp = pd.DataFrame({'Features': X_train.columns, 'Importance': imp, 'Importance weights': imp_var})
         df_imp = df_imp.sort_values('Importance', ascending=False)
         return df_imp[['Importance weights', 'Features']]
-    except:
+    except Exception as err:
         print('Error: model is not supported')
+        err_logging(err)
+        raise Exception(err)
 
-@func_logging
+@execution_time_logging
 def eli5_perm_importance(X_train, y_train, model, **kwargs):
     perm = PermutationImportance(model).fit(X_train, y_train)
     return eli5.show_weights(perm, feature_names=X_train.columns.tolist(), **kwargs)
@@ -47,8 +49,10 @@ def eli5_weights_importance(X_train, model, **kwargs):
     try:
         weights = eli5.show_weights(model, feature_names=list(X_train.columns), **kwargs)
         return weights
-    except:
+    except Exception as err:
         print('Error: model is not supported')
+        err_logging(err)
+        raise Exception(err)
 
 
 def eli5_instance_importance(X_train, instance, model, **kwargs):
@@ -56,8 +60,10 @@ def eli5_instance_importance(X_train, instance, model, **kwargs):
         prediction = eli5.show_prediction(model, instance, show_feature_values=True,
                                           feature_names=list(X_train.columns), **kwargs)
         return prediction
-    except:
+    except Exception as err:
         print('Error: model is not supported')
+        err_logging(err)
+        raise Exception(err)
 
 # if __name__ == '__main__':
 #     file_path = '../data/adult.csv'

@@ -3,15 +3,15 @@ import functools
 import logging
 
 
-def init_logging(logfile):
+def init_logging(logfile, level=logging.INFO):
     logger = logging.getLogger(logfile)
     if not len(logging.getLogger(logfile).handlers):
-        formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(module)s: %(message)s',
-                                      datefmt='%m/%d/%Y %H:%M:%S')
+        log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(module)s: %(message)s',
+                                          datefmt='%m/%d/%Y %H:%M:%S')
         fh = logging.FileHandler(logfile)
-        fh.setFormatter(formatter)
+        fh.setFormatter(log_formatter)
         logger.addHandler(fh)
-        logger.setLevel(logging.INFO)
+        logger.setLevel(level)
     return logger
 
 # def get_logger(logfile):
@@ -19,7 +19,7 @@ def init_logging(logfile):
 #     return logger
 
 
-def func_logging(func):
+def execution_time_logging(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if 'logfile' in kwargs.keys():
@@ -35,7 +35,13 @@ def func_logging(func):
         end = time.perf_counter()
         msg = '{} running time: {} ms'.format(func.__name__, (end - start) * 1000)
         logger.info(msg)
-        print('logging to file: ', logfile)
+        # print('logging to file: ', logfile)
         return res
 
     return wrapper
+
+def err_logging(msg):
+    level = logging.ERROR
+    logfile = '../logs/err_msg.log'
+    logger = init_logging(logfile, level)
+    logger.error(msg)
