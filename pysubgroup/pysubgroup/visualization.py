@@ -6,8 +6,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from matplotlib import pyplot as plt
 
-import pysubgroup as ps
-
+import pysubgroup.pysubgroup as ps
 
 def plot_sgbars(result_df, data=None, ylabel="target share", title="Discovered Subgroups", dynamic_widths=False,
                 suffix=""):

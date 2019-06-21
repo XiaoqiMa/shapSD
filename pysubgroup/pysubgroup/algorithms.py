@@ -9,7 +9,7 @@ from heapq import heappush, heappop
 from itertools import islice
 
 import numpy as np
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 
 
 class SubgroupDiscoveryTask(object):

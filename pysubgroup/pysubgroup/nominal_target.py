@@ -7,10 +7,8 @@ import numpy as np
 import scipy.stats
 from functools import total_ordering
 
-import pysubgroup as ps
-
-from .subgroup import SubgroupDescription, Subgroup, NominalSelector
-
+import pysubgroup.pysubgroup as ps
+from pysubgroup.pysubgroup.subgroup import SubgroupDescription, Subgroup, NominalSelector
 
 @total_ordering
 class NominalTarget(object):

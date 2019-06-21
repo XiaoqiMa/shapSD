@@ -5,7 +5,7 @@ Created on 28.04.2016
 '''
 import numpy as np
 import pandas as pd
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 from functools import total_ordering
 
 

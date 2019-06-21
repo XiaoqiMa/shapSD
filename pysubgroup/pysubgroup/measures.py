@@ -4,7 +4,7 @@ Created on 28.04.2016
 @author: lemmerfn
 '''
 import numpy as np
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 
 
 class AbstractInterestingnessMeasure(object):

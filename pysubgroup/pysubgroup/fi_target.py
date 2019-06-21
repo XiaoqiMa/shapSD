@@ -4,7 +4,7 @@ Created on 29.09.2017
 @author: lemmerfn
 '''
 from functools import total_ordering
-import pysubgroup as ps
+import pysubgroup.pysubgroup as ps
 
 
 @total_ordering
