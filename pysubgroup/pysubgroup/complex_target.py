@@ -4,6 +4,9 @@ from functools import total_ordering
 from scipy.stats import linregress
 from scipy.stats import spearmanr
 
+np.warnings.filterwarnings('ignore')
+
+
 @total_ordering
 class ComplexTarget(object):
     def __init__(self, target_variable_set):
@@ -25,8 +28,10 @@ class ComplexTarget(object):
         return [var for var in self.target_variable_set]
 
     def get_corr_statistics(self, data, subgroup):
-
         sg_instances = subgroup.subgroup_description.covers(data)
+        instances_dataset_len = len(data)
+        instances_sg_len = np.sum(sg_instances)
+        complement_sg_len = instances_dataset_len - instances_sg_len
 
         all_target_values_x1 = data[self.target_variable_set[0]]
         all_target_values_x2 = data[self.target_variable_set[1]]
@@ -35,22 +40,9 @@ class ComplexTarget(object):
         sg_complement_x1 = all_target_values_x1[~all_target_values_x1.index.isin(sg_instances)]
         sg_complement_x2 = all_target_values_x2[~all_target_values_x2.index.isin(sg_instances)]
 
-        instances_dataset_len = len(data)
-        instances_sg_len = np.sum(sg_instances)
-        complement_sg_len = instances_dataset_len - instances_sg_len
-        try:
-            # sg_corr = np.corrcoef(sg_target_values_x1, sg_target_values_x2)[0, 1]
-            # dataset_corr = np.corrcoef(all_target_values_x1, all_target_values_x2)[0, 1]
-            # sg_complement_corr = np.corrcoef(sg_complement_x1, sg_complement_x2)[0, 1]
-
-            sg_corr = spearmanr(sg_target_values_x1, sg_target_values_x2).correlation
-            dataset_corr = spearmanr(all_target_values_x1, all_target_values_x2).correlation
-            sg_complement_corr = spearmanr(sg_complement_x1, sg_complement_x2).correlation
-        except Exception as err:
-            sg_corr = dataset_corr = sg_complement_corr = 0.5
-            print(err)
-            # raise Exception('Cannot get correlation statistics')
-
+        sg_corr = spearmanr(sg_target_values_x1, sg_target_values_x2).correlation
+        dataset_corr = spearmanr(all_target_values_x1, all_target_values_x2).correlation
+        sg_complement_corr = spearmanr(sg_complement_x1, sg_complement_x2).correlation
         # sg_slope = linregress(sg_target_values_x1, sg_target_values_x2).slope
         # dataset_slope = linregress(all_target_values_x1, all_target_values_x2).slope
         # sg_complement_slope = linregress(sg_complement_x1, sg_complement_x2).slope
@@ -59,9 +51,7 @@ class ComplexTarget(object):
                 instances_sg_len, sg_corr,
                 complement_sg_len, sg_complement_corr)
 
-
     def calculate_corr_statistics(self, data, subgroup):
-
         args = self.get_corr_statistics(data, subgroup)
         instances_dataset_len = args[0]
         dataset_corr = args[1]
@@ -79,8 +69,7 @@ class ComplexTarget(object):
         # subgroup.statistics['sg_slope'] = sg_slope
         # subgroup.statistics['dataset_slope'] = dataset_slope
         # subgroup.statistics['complement_sg_slope'] = sg_complement_slope
-        subgroup.statistics['corr_lift'] = subgroup.statistics['sg_corr'] / \
-                                           subgroup.statistics['dataset_corr']
+        subgroup.statistics['corr_lift'] = subgroup.statistics['sg_corr'] / subgroup.statistics['dataset_corr']
         # print('sub sta: ', subgroup.statistics)
         # print('type sta: ', type(subgroup.statistics))
         return subgroup.statistics
@@ -99,20 +88,20 @@ class CorrelationQF(ps.CorrelationModelMeasure):
         self.measure = measure
 
     def corr_qf(self, **statistics):
-        complement_sg_size = statistics['complement_sg_size'],
+        complement_sg_size = statistics['complement_sg_size']
         complement_sg_corr = statistics['complement_sg_corr']
         sg_size = statistics['sg_size']
         sg_corr = statistics['sg_corr']
-
-        if sg_size == 0:
+        if sg_size == 0 or np.isnan(sg_corr):
             return 0
         if self.measure == 'abs_diff':
-            return np.abs(sg_corr - complement_sg_corr)
+            # print('sg_corr: {}, com_corr: {}, diff: {}'.format(sg_corr, complement_sg_corr, np.abs(sg_corr- complement_sg_corr)))
+            return round(np.abs(sg_corr - complement_sg_corr), 4)
         elif self.measure == 'entropy':
             n = sg_size / (sg_size + complement_sg_size)
             n_bar = 1 - n
             entropy = -(np.log2(n) * n + np.log2(n_bar) * n_bar)
-            return entropy * np.abs(sg_corr - complement_sg_corr)
+            return round(entropy * np.abs(sg_corr - complement_sg_corr), 4)
         elif self.measure == 'significance_test':
             pass
         else:
@@ -123,7 +112,7 @@ class CorrelationQF(ps.CorrelationModelMeasure):
         if not self.is_applicable(subgroup):
             raise BaseException('Correlation model Quality measure can not be used')
         statistics = subgroup.calculate_corr_statistics(data)
-        # print(type(subgroup.calculate_corr_statistics(data)))
+        # print('subgroup: ', subgroup.subgroup_description)
         return self.evaluate_from_statistics(**statistics)
 
     def evaluate_from_statistics(self, **statistics):

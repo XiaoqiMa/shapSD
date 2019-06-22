@@ -157,10 +157,13 @@ class BeamSearch(object):
                     # create a clone
                     new_selectors = list(last_sg.subgroup_description.selectors)
                     if not sel in new_selectors:
-                        new_selectors.append(sel)
-                        sg = ps.Subgroup(task.target, new_selectors)
-                        quality = task.qf.evaluate_from_dataset(task.data, sg)
-                        ps.add_if_required(beam, sg, quality, task, check_for_duplicates=True)
+                        try:
+                            new_selectors.append(sel)
+                            sg = ps.Subgroup(task.target, new_selectors)
+                            quality = task.qf.evaluate_from_dataset(task.data, sg)
+                            ps.add_if_required(beam, sg, quality, task, check_for_duplicates=True)
+                        except Exception:
+                            continue
             depth += 1
 
         result = beam[:task.result_set_size]
