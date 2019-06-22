@@ -206,6 +206,11 @@ class Subgroup(object):
     def calculate_statistics(self, data, weighting_attribute=None):
         self.target.calculate_statistics(self, data, weighting_attribute)
 
+    def get_corr_statistics(self, data):
+        return self.target.get_corr_statistics(data, self)
+
+    def calculate_corr_statistics(self, data):
+        return self.target.calculate_corr_statistics(data, self)
 
 def create_selectors(data, nbins=5, intervals_only=True, ignore=None):
     if ignore is None:

@@ -5,6 +5,7 @@ from pysubgroup.pysubgroup.utils import *
 
 from pysubgroup.pysubgroup.nominal_target import *
 from pysubgroup.pysubgroup.numeric_target import *
+from pysubgroup.pysubgroup.complex_target import *
 from pysubgroup.pysubgroup.fi_target import *
 
 from pysubgroup.pysubgroup.visualization import *

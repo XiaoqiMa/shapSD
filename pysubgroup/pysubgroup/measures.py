@@ -26,6 +26,16 @@ class BoundedInterestingnessMeasure:
     pass
 
 
+class CorrelationModelMeasure(object):
+    def evaluate_from_dataset(self, data, subgroup):
+        raise Exception('Absolute difference of corr not implemented yet')
+
+    def evaluate_from_statistics(self, **statistics):
+        raise Exception('Absolute difference of corr not implemented yet')
+
+    def is_applicable(self, subgroup):
+        raise Exception('Subgroup is not supported by correlation model')
+
 class CombinedInterestingnessMeasure(AbstractInterestingnessMeasure, BoundedInterestingnessMeasure):
     def __init__(self, measures, weights=None):
         self.measures = measures
