@@ -33,7 +33,10 @@ def execution_time_logging(func):
         start = time.perf_counter()
         res = func(*args, **kwargs)
         end = time.perf_counter()
-        msg = '{} running time: {} ms'.format(func.__name__, (end - start) * 1000)
+        running_time_ms = (end - start) * 1000
+        rest, t_ms = divmod(running_time_ms, 1000)
+        t_minute, t_s = divmod(rest, 60)
+        msg = '{} running time: {}M:{}s:{}ms'.format(func.__name__, int(t_minute), int(t_s), int(t_ms))
         logger.info(msg)
         # print('logging to file: ', logfile)
         return res

@@ -71,4 +71,4 @@ def eli5_instance_importance(X_train, instance, model, **kwargs):
 #     model = rf_clf_model(X_train, y)
 #     # raw_perm_importance(X_train, y, model)
 #     imp = eli5_perm_importance(X_train, y, model)
-#     save_file(imp.data, 'eli5_importance.html')
+#     save_img_file(imp.data, 'eli5_importance.html')
