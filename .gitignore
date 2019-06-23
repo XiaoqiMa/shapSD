@@ -7,3 +7,5 @@ doc/_build
 .ipynb_checkpoints
 build
 venv
+logs
+notebooks
