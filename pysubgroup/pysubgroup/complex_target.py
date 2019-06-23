@@ -39,10 +39,15 @@ class ComplexTarget(object):
         sg_target_values_x2 = all_target_values_x2[sg_instances]
         sg_complement_x1 = all_target_values_x1[~all_target_values_x1.index.isin(sg_instances)]
         sg_complement_x2 = all_target_values_x2[~all_target_values_x2.index.isin(sg_instances)]
-
+        # spearmanr correlation
         sg_corr = spearmanr(sg_target_values_x1, sg_target_values_x2).correlation
         dataset_corr = spearmanr(all_target_values_x1, all_target_values_x2).correlation
         sg_complement_corr = spearmanr(sg_complement_x1, sg_complement_x2).correlation
+
+        # pearson correlation
+        # sg_corr = np.corrcoef(sg_target_values_x1, sg_target_values_x2)[0, 1]
+        # dataset_corr = np.corrcoef(all_target_values_x1, all_target_values_x2)[0, 1]
+        # sg_complement_corr = np.corrcoef(sg_complement_x1, sg_complement_x2)[0, 1]
         # sg_slope = linregress(sg_target_values_x1, sg_target_values_x2).slope
         # dataset_slope = linregress(all_target_values_x1, all_target_values_x2).slope
         # sg_complement_slope = linregress(sg_complement_x1, sg_complement_x2).slope

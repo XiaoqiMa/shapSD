@@ -36,7 +36,7 @@ def test_complex():
     # task = ps.SubgroupDiscoveryTask(X, target, search_space, qf=ps.CorrelationQF())
     task = ps.SubgroupDiscoveryTask(X, target, search_space, qf=ps.CorrelationQF('entropy'))
     result = ps.BeamSearch().execute(task)
-    result = ps.overlap_filter(result, X, similarity_level=0.7)
+    result = ps.overlap_filter(result, X, similarity_level=0.9)
     for (q, sg) in result:
         print(str(q) + ":\t" + str(sg.subgroup_description))
 
@@ -79,4 +79,4 @@ def test_shap_values():
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(df)
 
-test_shap_values()
+test_complex()
