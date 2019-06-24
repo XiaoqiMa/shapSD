@@ -3,9 +3,10 @@ provides methods to initialize models, support RandomForest, LightGBM, XGBoost a
 author: Xiaoqi
 date: 2019.06.24
 """
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import xgboost as xgb
 import lightgbm as lgb
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
 
 
 class InitializeModel(object):

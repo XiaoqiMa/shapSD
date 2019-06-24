@@ -1,6 +1,11 @@
+"""
+provide custom logging functions, e.g. record running time, log error message
+author: Xiaoqi
+date: 2019.06.24
+"""
 import time
-import functools
 import logging
+import functools
 
 
 def init_logging(logfile, level=logging.INFO):
@@ -14,10 +19,6 @@ def init_logging(logfile, level=logging.INFO):
         logger.setLevel(level)
     return logger
 
-# def get_logger(logfile):
-#     logger = logging.getLogger(logfile)
-#     return logger
-
 
 def execution_time_logging(func):
     @functools.wraps(func)
@@ -26,10 +27,9 @@ def execution_time_logging(func):
             logfile = kwargs['logfile']
             logfile = '../logs/{}'.format(logfile)
         else:
-            logfile = '../logs/execution_time.log'
+            logfile = '../logs/execution_time.log'  # default log file
 
         logger = init_logging(logfile)
-        # print('handlers: ', logger.handlers)
         start = time.perf_counter()
         res = func(*args, **kwargs)
         end = time.perf_counter()
@@ -38,10 +38,10 @@ def execution_time_logging(func):
         t_minute, t_s = divmod(rest, 60)
         msg = '{} running time: {}M:{}s:{}ms'.format(func.__name__, int(t_minute), int(t_s), int(t_ms))
         logger.info(msg)
-        # print('logging to file: ', logfile)
         return res
 
     return wrapper
+
 
 def err_logging(msg):
     level = logging.ERROR
