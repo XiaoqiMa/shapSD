@@ -1,7 +1,7 @@
 import numpy as np
 import eli5
 from eli5.sklearn import PermutationImportance
-
+from sklearn.metrics import mean_squared_log_error
 from shapSD.logging_custom import *
 from shapSD.model_init import *
 from shapSD.utils import *
@@ -12,23 +12,42 @@ def raw_perm_importance(X_train, y_train, model, iteration=10):
     imp = []
     imp_var = []
     try:
-        base_score = model.score(X_train, y_train)
-        for col in X_train.columns:
-            scores = []
-            for m in range(iteration):
-                x = X_train.copy()
-                x[col] = np.random.permutation(x[col])
-                score = model.score(x, y_train)
-                scores.append(score)
-            score_drop_list = np.array(base_score) - np.array(scores)
-            variance = np.round(np.var(score_drop_list), 6)
-            score_mean_drop = np.round(np.mean(score_drop_list), 4)
-            imp.append(score_mean_drop)
-            imp_var.append('{}±{}'.format(score_mean_drop, variance))
+        if hasattr(model, 'score'):
+            base_score = model.score(X_train, y_train)
+            for col in X_train.columns:
+                scores = []
+                for m in range(iteration):
+                    x = X_train.copy()
+                    x[col] = np.random.permutation(x[col])
+                    score = model.score(x, y_train)
+                    scores.append(score)
+                score_drop_list = np.array(base_score) - np.array(scores)
+                variance = np.round(np.var(score_drop_list), 6)
+                score_mean_drop = np.round(np.mean(score_drop_list), 4)
+                imp.append(score_mean_drop)
+                imp_var.append('{}±{}'.format(score_mean_drop, variance))
 
-        df_imp = pd.DataFrame({'Features': X_train.columns, 'Importance': imp, 'Importance weights': imp_var})
-        df_imp = df_imp.sort_values('Importance', ascending=False)
-        return df_imp[['Importance weights', 'Features']]
+            df_imp = pd.DataFrame({'Features': X_train.columns, 'Importance': imp, 'Importance weights': imp_var})
+            df_imp = df_imp.sort_values('Importance', ascending=False)
+            return df_imp[['Importance weights', 'Features']]
+        else:
+            base_score = mean_squared_log_error(model.predict(X_train), y_train)
+            for col in X_train.columns:
+                scores = []
+                for m in range(iteration):
+                    x = X_train.copy()
+                    x[col] = np.random.permutation(x[col])
+                    score = mean_squared_log_error(model.predict(x), y_train)
+                    scores.append(score)
+                score_rmse_list = np.array(scores) - np.array(base_score)
+                variance = np.round(np.var(score_rmse_list), 6)
+                score_rmse_inc = np.round(np.mean(score_rmse_list), 4)
+                imp.append(score_rmse_inc)
+                imp_var.append('{}±{}'.format(score_rmse_inc, variance))
+
+            df_imp = pd.DataFrame({'Features': X_train.columns, 'Importance': imp, 'Importance weights': imp_var})
+            df_imp = df_imp.sort_values('Importance', ascending=False)
+            return df_imp[['Importance weights', 'Features']]
     except Exception as err:
         print('Error: model is not supported')
         err_logging(err)

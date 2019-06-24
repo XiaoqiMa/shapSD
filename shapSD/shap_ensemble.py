@@ -2,7 +2,7 @@ import shap
 import numpy as np
 from shapSD.utils import *
 from shapSD.logging_custom import *
-
+import time
 
 def calc_shap_values(X_train, model, **kwargs):
     try:
@@ -65,12 +65,12 @@ def shap_summary_plot(X_train, model, plot_type='dot', interaction=False, **kwar
         if not interaction:
             explainer, shap_values, expected_vlaue = calc_shap_values(X_train, model, **kwargs)
             shap.summary_plot(shap_values, X_train, plot_type=plot_type, show=False, **kwargs)
-            save_fig('summary_plot_{}'.format(np.random.randint(0, 100)))
+            save_fig('summary_plot_{}'.format(str(time.time()).split('.')[0]))
             return
         else:
             explainer, shap_inter_values, expected_vlaue = calc_shap_inter_values(X_train, model, **kwargs)
             shap.summary_plot(shap_inter_values, X_train, show=False, **kwargs)
-            save_fig('inter_summary_plot_{}'.format(np.random.randint(0, 100)))
+            save_fig('inter_summary_plot_{}'.format(str(time.time()).split('.')[0]))
             return
     except Exception as err:
         print('Error: model is not supported by SHAP summary plot')
@@ -87,7 +87,7 @@ def shap_dependence_plot(X_train, model, ind, interaction_index, interaction=Fal
                                  shap_values=shap_values,
                                  features=X_train,
                                  display_features=X_train, show=False, **kwargs)
-            save_fig('dependence_plot_{}'.format(ind))
+            save_fig('dependence_plot_{}_{}'.format(ind, str(time.time()).split('.')[0]))
             return
         else:
             explainer, shap_inter_values, expected_value = calc_shap_inter_values(X_train, model, **kwargs)
@@ -96,7 +96,7 @@ def shap_dependence_plot(X_train, model, ind, interaction_index, interaction=Fal
                                  shap_inter_values,
                                  features=X_train,
                                  display_features=X_train, show=False, **kwargs)
-            save_fig('inter_dependence_{}'.format(ind))
+            save_fig('inter_dependence_{}_{}'.format(ind, str(time.time()).split('.')[0]))
             return
 
     except Exception as err:

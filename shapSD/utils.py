@@ -25,4 +25,4 @@ def save_dataframe(df, file_id, description):
     path = os.path.join(PROJECT_ROOT_DIR, 'logs', file_id)
     with open(path, 'a') as f:
         f.write('\n{}\n'.format(description))
-    df.to_csv(path, header=None, index=None, sep='\t', mode='a')
+    df.to_csv(path, index=None, sep='\t', mode='a')
