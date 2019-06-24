@@ -3,7 +3,8 @@ from shapSD.binary_flip import *
 from shapSD.model_init import *
 import pysubgroup.pysubgroup as ps
 import lightgbm as lgb
-
+import shap
+from shapSD.utils import save_dataframe
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
@@ -46,18 +47,39 @@ class TestBinaryFlip(unittest.TestCase):
         df_effect = calc_flip_effect(X_train, flip_attr, model)
         self.assertEqual(len(df_effect.columns), len(X_train.columns) + 1)
 
-    # def test_subgroup_discovery(self):
-    #     adult = self.read_data()
-    #     X_train, y, model = self.model_init()
-    #     flip_attr = 'sex'
-    #     df_effect = calc_flip_effect(X_train, flip_attr, model)
-    #     new_adult = adult.drop('income', axis=1)
-    #     new_adult['effect'] = df_effect['effect']
-    #
-    #     target = ps.NumericTarget('effect')
-    #     search_space = ps.create_nominal_selectors(new_adult, ignore=['effect'])
-    #     task = ps.SubgroupDiscoveryTask(new_adult, target, search_space, qf=ps.StandardQFNumeric(1))
-    #     result = ps.BeamSearch().execute(task)
-    #     # result = ps.overlap_filter(result, new_adult, similarity_level=0.7)
-    #     df_result = ps.results_as_df(new_adult, result, statistics_to_show=ps.all_statistics_numeric)
-    #     print(df_result)
+    def test_effect(self):
+        X_train, y, model = self.model_init()
+        flip_attr = 'sex'
+        df_effect = calc_flip_effect(X_train, flip_attr, model)
+        new_adult = pd.read_csv('../data/adult.csv', index_col=0).drop('income', axis=1)
+        new_adult['effect'] = df_effect['effect']
+
+        target = ps.NumericTarget('effect')
+        search_space = ps.create_selectors(new_adult, ignore=['effect', 'sex'])
+        task = ps.SubgroupDiscoveryTask(new_adult, target, search_space, qf=ps.StandardQFNumeric(1), result_set_size=20)
+        result = ps.BeamSearch().execute(task)
+        result = ps.overlap_filter(result, new_adult, similarity_level=0.8)
+        df_result = ps.results_as_df(new_adult, result, statistics_to_show=ps.all_statistics_numeric)
+        save_dataframe(df_result, 'binanry_subgroup.csv', description='flip sex value, observe prediction change')
+
+    def test_shap(self):
+        X_train, y, model = self.lgb_model_init()
+        X = pd.read_csv('../data/adult.csv', index_col=0).drop('income', axis=1)
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer.shap_values(X_train)
+
+        flip_attr = 'sex'
+        attr_index = list(X.columns).index(flip_attr)
+        X['shap_values'] = shap_values[:, attr_index]
+
+        target = ps.NumericTarget('shap_values')
+        # search_space = ps.create_nominal_selectors(X, ignore=['shap_values'])
+        search_space = ps.create_selectors(X, ignore=['shap_values', 'sex'])
+        task = ps.SubgroupDiscoveryTask(X, target, search_space, qf=ps.StandardQFNumeric(1), result_set_size=20)
+        result = ps.BeamSearch().execute(task)
+        result = ps.overlap_filter(result, X, similarity_level=0.8)
+
+        df = ps.results_as_df(X, result, statistics_to_show=ps.all_statistics_numeric)
+        save_dataframe(df, 'binanry_subgroup.csv', description='sex shapley values as target')
+
+

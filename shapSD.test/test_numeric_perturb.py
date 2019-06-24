@@ -3,10 +3,12 @@ from shapSD.numeric_perturb import *
 from shapSD.model_init import *
 import pysubgroup.pysubgroup as ps
 import lightgbm as lgb
+from shapSD.utils import save_dataframe
+import warnings
 
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-np.warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 
 class TestNumericPerturb(unittest.TestCase):
@@ -53,7 +55,8 @@ class TestNumericPerturb(unittest.TestCase):
         adult = pd.read_csv('../data/adult.csv', index_col=0)
         # X_train, y, model = self.model_init()
         X_train, y, model = self.lgb_model_init()
-        perturb_attr = 'age'
+        # perturb_attr = 'age'
+        perturb_attr = 'education-num'
         df_effect = calc_perturb_effect(X_train, perturb_attr, model)
         new_adult = adult.drop('income', axis=1)
         new_adult['attr_change'] = df_effect['attr_change']
@@ -66,3 +69,4 @@ class TestNumericPerturb(unittest.TestCase):
         # result = ps.overlap_filter(result, new_adult, similarity_level=0.7)
         df_result = ps.results_as_df(new_adult, result, statistics_to_show=ps.complex_statistics, complex_target=True)
         print(df_result)
+        save_dataframe(df_result, 'numeric_perturb.csv', description='perturb age')
