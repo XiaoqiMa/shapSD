@@ -9,30 +9,8 @@ import pandas as pd
 
 class DataEncoder(object):
 
-    def __init__(self, df_data, encoding_type='label', **kwargs):
-        """
-        Parameters
-        -----------
-        df_data: pandas dataframe, input data
-        encoding_type: str
-                    label: label encoding
-                    onehot: onehot encoding
-                    discretization: equal frequency discretization
-        kwargs: optional, e.g. q=10 indicates quantile to cut
-
-        Return:
-        ----------
-        data: dataframe after encoding
-        """
+    def __init__(self, df_data):
         self.df_data = df_data
-        if encoding_type == 'label':
-            self.label_encoding()
-        elif encoding_type == 'onehot':
-            self.onehot_encoding()
-        elif encoding_type == 'discretization':
-            self.num_discretization(**kwargs)
-        else:
-            raise Exception('{} is not supported'.format(encoding_type))
 
     def label_encoding(self):
         try:
@@ -50,8 +28,8 @@ class DataEncoder(object):
         data = self.df_data.copy()
         return pd.get_dummies(data)
 
-    def num_discretization(self, quantile=10):
+    def num_discretization(self, quantile=10, **kwargs):
         data = self.df_data.copy()
         num_cols = data.select_dtypes(['number']).columns
-        data[num_cols] = data[num_cols].apply(lambda x: pd.qcut(x, quantile, duplicates='drop').astype(str))
+        data[num_cols] = data[num_cols].apply(lambda x: pd.qcut(x, quantile, duplicates='drop', **kwargs).astype(str))
         return data

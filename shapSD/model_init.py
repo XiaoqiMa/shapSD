@@ -11,47 +11,9 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 class InitializeModel(object):
 
-    def __init__(self, x_train, y_train, model_type, pred_type='classification', **kwargs):
-        """
-        Parameters
-        -----------
-        x_train: pandas dataframe, input train data
-        y_train: pandas dataframe, input train target
-        model_type: str
-                    rf: random forest
-                    lightgbm: a gradient boosting framework
-                    xgboost: an optimized distributed gradient boosting model
-        pred_type: str, prediction type
-                    classification: classification tasks for prediction
-                    regression: regression tasks for prediction
-        kwargs: optional
-
-        Return:
-        ----------
-        model: classification or regression model
-        """
+    def __init__(self, x_train, y_train):
         self.x_train = x_train
         self.y_train = y_train
-        if pred_type == 'classification':
-            if model_type == 'rf':
-                self.rf_clf_model(**kwargs)
-            elif model_type == 'lightgbm':
-                self.lgb_clf_model(**kwargs)
-            elif model_type == 'xgboost':
-                self.xgb_clf_model(**kwargs)
-            else:
-                raise Exception('Cannot initialize {} classification model'.format(model_type))
-        elif pred_type == 'regression':
-            if model_type == 'rf':
-                self.rf_reg_model(**kwargs)
-            elif model_type == 'lightgbm':
-                self.lgb_reg_model(**kwargs)
-            elif model_type == 'xgboost':
-                self.xgb_reg_model(**kwargs)
-            else:
-                raise Exception('Cannot initialize {} regression model'.format(model_type))
-        else:
-            raise Exception('Does not support model initialization')
 
     def rf_clf_model(self, **kwargs):
         model = RandomForestClassifier(random_state=0, n_estimators=30, **kwargs)
