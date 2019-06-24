@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 PROJECT_ROOT_DIR = ".."
 IMG_FOLDER = "imgs"
+FILE_FOLDER = 'files'
 
 
 # save the figures
@@ -21,8 +22,9 @@ def save_img_file(file, file_id):
         f.write(file)
 
 
-def save_dataframe(df, file_id, description):
-    path = os.path.join(PROJECT_ROOT_DIR, 'logs', file_id)
+# save dataframe to csv file
+def save_dataframe(df, file_id, description=None):
+    path = os.path.join(PROJECT_ROOT_DIR, FILE_FOLDER, file_id)
     with open(path, 'a') as f:
         f.write('\n{}\n'.format(description))
     df.to_csv(path, index=None, sep='\t', mode='a')
