@@ -1,6 +1,7 @@
 from shapSD.encoding import *
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 # import xgboost as xgb
+import lightgbm as lgb
 
 
 def read_data(file_path):
@@ -28,6 +29,39 @@ def rf_reg_model(X_train, y, **kwargs):
     model.fit(X_train, y)
     return model
 
+
+def lgb_clf_model(X_train, y, **kwargs):
+    params = {
+        "max_bin": 512,
+        "learning_rate": 0.05,
+        "boosting_type": "gbdt",
+        "objective": "binary",
+        "metric": "binary_logloss",
+        "num_leaves": 10,
+        "verbose": -1,
+        "min_data": 100,
+        "boost_from_average": True
+    }
+    d_train = lgb.Dataset(X_train, label=y)
+    model = lgb.train(params, d_train, 100, verbose_eval=1000)
+    return model
+
+
+def lgb_reg_model(X_train, y, **kwargs):
+    params = {
+        "max_bin": 512,
+        "learning_rate": 0.05,
+        "boosting_type": "gbdt",
+        "objective": "regression",
+        "metric": "binary_logloss",
+        "num_leaves": 10,
+        "verbose": -1,
+        "min_data": 100,
+        "boost_from_average": True
+    }
+    d_train = lgb.Dataset(X_train, label=y)
+    model = lgb.train(params, d_train, 100, verbose_eval=1000)
+    return model
 
 # def xgb_clf_model(X_train, y, **kwargs):
 #     xgc = xgb.XGBClassifier(n_estimators=50, max_depth=20, base_score=0.5,

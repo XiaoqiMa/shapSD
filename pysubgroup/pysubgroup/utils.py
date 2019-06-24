@@ -25,7 +25,8 @@ all_statistics_numeric = (
     'max_dataset', 'min_sg', 'min_dataset', 'mean_lift', 'median_lift')
 
 complex_statistics = ('sg_size', 'dataset_size', 'complement_sg_size', 'sg_corr',
-                      'dataset_corr', 'complement_sg_corr', 'corr_lift')
+                      'dataset_corr', 'complement_sg_corr', 'corr_lift',)
+
 
 def add_if_required(result, sg, quality, task, check_for_duplicates=False):
     if quality > task.min_quality:

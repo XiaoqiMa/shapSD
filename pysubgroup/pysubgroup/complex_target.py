@@ -2,9 +2,11 @@ import numpy as np
 import pysubgroup.pysubgroup as ps
 from functools import total_ordering
 from scipy.stats import linregress
+from scipy.stats import pearsonr
 from scipy.stats import spearmanr
-
-np.warnings.filterwarnings('ignore')
+from scipy.stats import norm
+import warnings
+warnings.filterwarnings('ignore')
 
 
 @total_ordering
@@ -39,22 +41,29 @@ class ComplexTarget(object):
         sg_target_values_x2 = all_target_values_x2[sg_instances]
         sg_complement_x1 = all_target_values_x1[~all_target_values_x1.index.isin(sg_instances)]
         sg_complement_x2 = all_target_values_x2[~all_target_values_x2.index.isin(sg_instances)]
+        # https://machinelearningmastery.com/statistical-hypothesis-tests-in-python-cheat-sheet/
         # spearmanr correlation
-        sg_corr = spearmanr(sg_target_values_x1, sg_target_values_x2).correlation
-        dataset_corr = spearmanr(all_target_values_x1, all_target_values_x2).correlation
-        sg_complement_corr = spearmanr(sg_complement_x1, sg_complement_x2).correlation
+        # sg_corr = spearmanr(sg_target_values_x1, sg_target_values_x2).correlation
+        # dataset_corr = spearmanr(all_target_values_x1, all_target_values_x2).correlation
+        # sg_complement_corr = spearmanr(sg_complement_x1, sg_complement_x2).correlation
+
+        # mean prediciton change
+        dataset_mean_x2 = np.mean(all_target_values_x2)
+        sg_mean_x2 = np.mean(sg_target_values_x2)
 
         # pearson correlation
-        # sg_corr = np.corrcoef(sg_target_values_x1, sg_target_values_x2)[0, 1]
-        # dataset_corr = np.corrcoef(all_target_values_x1, all_target_values_x2)[0, 1]
-        # sg_complement_corr = np.corrcoef(sg_complement_x1, sg_complement_x2)[0, 1]
+        sg_corr = pearsonr(sg_target_values_x1, sg_target_values_x2)[0]
+        dataset_corr = pearsonr(all_target_values_x1, all_target_values_x2)[0]
+        sg_complement_corr = pearsonr(sg_complement_x1, sg_complement_x2)[0]
+
         # sg_slope = linregress(sg_target_values_x1, sg_target_values_x2).slope
         # dataset_slope = linregress(all_target_values_x1, all_target_values_x2).slope
         # sg_complement_slope = linregress(sg_complement_x1, sg_complement_x2).slope
 
         return (instances_dataset_len, dataset_corr,
                 instances_sg_len, sg_corr,
-                complement_sg_len, sg_complement_corr)
+                complement_sg_len, sg_complement_corr,
+                dataset_mean_x2, sg_mean_x2)
 
     def calculate_corr_statistics(self, data, subgroup):
         args = self.get_corr_statistics(data, subgroup)
@@ -64,6 +73,8 @@ class ComplexTarget(object):
         sg_corr = args[3]
         complement_sg_len = args[4]
         sg_complement_corr = args[5]
+        dataset_mean_pred = args[6]
+        sg_mean_pred = args[7]
 
         subgroup.statistics['sg_size'] = instances_sg_len
         subgroup.statistics['dataset_size'] = instances_dataset_len
@@ -71,6 +82,8 @@ class ComplexTarget(object):
         subgroup.statistics['sg_corr'] = sg_corr
         subgroup.statistics['dataset_corr'] = dataset_corr
         subgroup.statistics['complement_sg_corr'] = sg_complement_corr
+        subgroup.statistics['dataset_mean_pred'] = dataset_mean_pred
+        subgroup.statistics['sg_mean_pred'] = sg_mean_pred
         # subgroup.statistics['sg_slope'] = sg_slope
         # subgroup.statistics['dataset_slope'] = dataset_slope
         # subgroup.statistics['complement_sg_slope'] = sg_complement_slope
@@ -108,7 +121,16 @@ class CorrelationQF(ps.CorrelationModelMeasure):
             entropy = -(np.log2(n) * n + np.log2(n_bar) * n_bar)
             return round(entropy * np.abs(sg_corr - complement_sg_corr), 4)
         elif self.measure == 'significance_test':
-            pass
+            z = 0.5 * np.log((1 + sg_corr) / (1 - sg_corr))
+            z_bar = 0.5 * np.log((1 + complement_sg_corr) / (1 - complement_sg_corr))
+            if sg_size > 25 and complement_sg_size > 25:
+                denominator = np.sqrt(1 / (sg_size - 3) + 1 / (complement_sg_size - 3))
+                z_score = (z - z_bar) / denominator
+                p_value = norm.sf(abs(z_score)) * 2  # twosided
+                print('quality: ', 1-p_value)
+                return 1 - p_value
+            else:
+                return 0
         else:
             raise BaseException("measurement is constrained to "
                                 "['abs_diff', 'entropy', 'significance_test']")
