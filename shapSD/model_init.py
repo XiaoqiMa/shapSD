@@ -3,10 +3,11 @@ provides methods to initialize models, support RandomForest, LightGBM, XGBoost a
 author: Xiaoqi
 date: 2019.06.24
 """
-import xgboost as xgb
+# import xgboost as xgb
 import lightgbm as lgb
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-
+import warnings
+warnings.filterwarnings('ignore')
 
 
 class InitializeModel(object):
@@ -57,14 +58,14 @@ class InitializeModel(object):
         model = lgb.train(params, d_train, 100, verbose_eval=1000, **kwargs)
         return model
 
-    def xgb_clf_model(self, **kwargs):
-        xgc = xgb.XGBClassifier(n_estimators=50, max_depth=20, base_score=0.5,
-                                objective='binary:logistic', random_state=42, **kwargs)
-        xgc.fit(self.x_train, self.y_train)
-        return xgc
-
-    def xgb_reg_model(self, **kwargs):
-        xgr = xgb.XGBRegressor(n_estimators=50, max_depth=20, base_score=0.5,
-                               objective='reg:logistic', random_state=42, **kwargs)
-        xgr.fit(self.x_train, self.y_train)
-        return xgr
+    # def xgb_clf_model(self, **kwargs):
+    #     xgc = xgb.XGBClassifier(n_estimators=50, max_depth=20, base_score=0.5,
+    #                             objective='binary:logistic', random_state=42, **kwargs)
+    #     xgc.fit(self.x_train, self.y_train)
+    #     return xgc
+    #
+    # def xgb_reg_model(self, **kwargs):
+    #     xgr = xgb.XGBRegressor(n_estimators=50, max_depth=20, base_score=0.5,
+    #                            objective='reg:logistic', random_state=42, **kwargs)
+    #     xgr.fit(self.x_train, self.y_train)
+    #     return xgr

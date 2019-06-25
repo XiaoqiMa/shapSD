@@ -17,15 +17,21 @@ class ShapValues(object):
         self.model = model
         self.explainer = explainer
 
-    def calc_shap_values(self, **kwargs):
+    def calc_shap_values(self, attr=None, **kwargs):
         try:
             exp = self.explainer(self.model, **kwargs)
             shap_values = exp.shap_values(self.x_train, **kwargs)
             if isinstance(shap_values, list):
                 shap_v = shap_values[1]
+                if attr is not None:
+                    attr_index = list(self.x_train.columns).index(attr)
+                    shap_v = shap_v[:, attr_index]
                 expected_v = exp.expected_value[1]
             else:
                 shap_v = shap_values
+                if attr is not None:
+                    attr_index = list(self.x_train.columns).index(attr)
+                    shap_v = shap_v[:, attr_index]
                 expected_v = exp.expected_value
             return exp, shap_v, expected_v
         except Exception as err:
