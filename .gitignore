@@ -9,3 +9,5 @@ build
 venv
 logs
 notebooks
+imgs
+files
