@@ -76,24 +76,15 @@ class FeatureImportance(object):
             err_logging(err)
             raise AttributeError(err)
 
-    def eli5_weights_importance(self, importance_type='gain', **kwargs):
+    def eli5_weights_importance(self,  **kwargs):
         """
-        Parameters
-        -------------
-        importance_type: str
-                        gain: average gain of the feature when it is used in trees
-                        weight: the number of times a feature is used to split the data
-                        cover: the average coverage of the feature
-        kwargs: optional
-
         Return
         -------------
         feature weights for each feature
         """
 
         try:
-            weights = eli5.show_weights(self.model, feature_names=self.x_train.columns.tolist(),
-                                        importance_type=importance_type, **kwargs)
+            weights = eli5.show_weights(self.model, feature_names=self.x_train.columns.tolist(), **kwargs)
             return weights
         except Exception as err:
             print('Error: model is not supported')
