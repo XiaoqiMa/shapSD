@@ -12,7 +12,7 @@ class TestBinaryFlip(unittest.TestCase):
 
     @staticmethod
     def read_data():
-        file_path = '../data/adult.csv'
+        file_path = '../../data/adult.csv'
         return pd.read_csv(file_path, index_col=0)
 
     def __init__(self, *args, **kwargs):

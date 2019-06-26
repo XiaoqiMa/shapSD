@@ -1,9 +1,9 @@
 import unittest
-from shapSD.model_init import *
-import pysubgroup.pysubgroup as ps
-from shapSD.utils import save_dataframe
-from shapSD.data_encoding import DataEncoder
-from shapSD.numeric_perturb import NumericPerturb
+from shapSD.feature_explainer.model_init import *
+import shapSD.pysubgroup as ps
+from shapSD.feature_explainer.utils import save_dataframe
+from shapSD.feature_explainer.data_encoding import DataEncoder
+from shapSD.feature_explainer.numeric_perturb import NumericPerturb
 import warnings
 import pandas as pd
 import time
@@ -15,7 +15,7 @@ class TestNumericPerturb(unittest.TestCase):
 
     @staticmethod
     def read_data():
-        file_path = '../data/adult.csv'
+        file_path = '../../data/adult.csv'
         return pd.read_csv(file_path, index_col=0)
 
     def __init__(self, *args, **kwargs):

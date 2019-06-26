@@ -10,9 +10,9 @@ from .feature_explainer.shap_ensemble import ShapValues
 from .pysubgroup.algorithms import *
 from .pysubgroup.complex_target import *
 from .pysubgroup.fi_target import *
-from .pysubgroup.measures import *
 from .pysubgroup.nominal_target import *
 from .pysubgroup.numeric_target import *
 from .pysubgroup.subgroup import *
 from .pysubgroup.utils import *
 from .pysubgroup.visualization import *
+from .pysubgroup.measures import *

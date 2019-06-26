@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from shapSD.data_encoding import DataEncoder
+from shapSD.feature_explainer.data_encoding import DataEncoder
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -10,7 +10,7 @@ class TestDataEncoding(unittest.TestCase):
 
     @staticmethod
     def read_data():
-        file_path = '../data/adult.csv'
+        file_path = '../../data/adult.csv'
         adult = pd.read_csv(file_path, index_col=0)
         return adult
 
