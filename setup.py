@@ -3,10 +3,8 @@ from setuptools import setup
 setup(
     name='shapSD',
     version='0.1.1',
-    packages=['shapSD', 'shapSD.test', 'pysubgroup'],
-    package_dir={'shapSD': 'shapSD', 'shapSD.test': "shapSD.test",
-                 'pysubgroup': 'pysubgroup/pysubgroup',
-                 'pysubgroup.tests': 'pysubgroup/pysubgroup.tests', },
+    packages=['shapSD', 'shapSD.feature_explainer', 'shapSD.pysubgroup'],
+    package_dir={'shapSD': 'shapSD'},
     url='https://github.com/XiaoqiMa/shapSD',
     download_url='https://github.com/XiaoqiMa/shapSD/archive/V0.1-alpha.tar.gz',
     license='MIT License (MIT)',
