@@ -3,6 +3,7 @@ provide custom logging functions, e.g. record running time, log error message
 author: Xiaoqi
 date: 2019.06.24
 """
+import os
 import time
 import logging
 import functools
@@ -48,3 +49,10 @@ def err_logging(msg):
     logfile = '../logs/err_msg.log'
     logger = init_logging(logfile, level)
     logger.error(msg)
+
+
+if __name__ == '__main__':
+    PROJECT_ROOT_DIR = "."
+    LOG_FOLDER = "logs"
+    log_dir = os.path.join(PROJECT_ROOT_DIR, LOG_FOLDER)
+    os.makedirs(log_dir, exist_ok=True)

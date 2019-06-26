@@ -1,12 +1,8 @@
 import os
 import matplotlib.pyplot as plt
 
-PROJECT_ROOT_DIR = ".."
-IMG_FOLDER = "imgs"
-FILE_FOLDER = 'files'
 
-
-def init_folder():
+def init_folder(PROJECT_ROOT_DIR, IMG_FOLDER, FILE_FOLDER):
     img_dir = os.path.join(PROJECT_ROOT_DIR, IMG_FOLDER)
     os.makedirs(img_dir, exist_ok=True)
 
@@ -39,3 +35,10 @@ def save_dataframe(df, file_id, description=None):
     with open(path, 'a') as f:
         f.write('\n{}\n'.format(description))
     df.to_csv(path, index=None, sep='\t', mode='a')
+
+
+if __name__ == '__main__':
+    PROJECT_ROOT_DIR = "."
+    IMG_FOLDER = "imgs"
+    FILE_FOLDER = 'files'
+    init_folder(PROJECT_ROOT_DIR, IMG_FOLDER, FILE_FOLDER)
