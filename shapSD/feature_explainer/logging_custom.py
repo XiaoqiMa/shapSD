@@ -8,6 +8,10 @@ import time
 import logging
 import functools
 
+PROJECT_ROOT_DIR = "."
+LOG_FOLDER = "logs"
+log_dir = os.path.join(PROJECT_ROOT_DIR, LOG_FOLDER)
+os.makedirs(log_dir, exist_ok=True)
 
 def init_logging(logfile, level=logging.INFO):
     logger = logging.getLogger(logfile)
@@ -26,9 +30,9 @@ def execution_time_logging(func):
     def wrapper(*args, **kwargs):
         if 'logfile' in kwargs.keys():
             logfile = kwargs['logfile']
-            logfile = '../logs/{}'.format(logfile)
+            logfile = 'logs/{}'.format(logfile)
         else:
-            logfile = '../logs/execution_time.log'  # default log file
+            logfile = 'logs/execution_time.log'  # default log file
 
         logger = init_logging(logfile)
         start = time.perf_counter()
@@ -46,13 +50,7 @@ def execution_time_logging(func):
 
 def err_logging(msg):
     level = logging.ERROR
-    logfile = '../logs/err_msg.log'
+    logfile = 'logs/err_msg.log'
     logger = init_logging(logfile, level)
     logger.error(msg)
 
-
-if __name__ == '__main__':
-    PROJECT_ROOT_DIR = "."
-    LOG_FOLDER = "logs"
-    log_dir = os.path.join(PROJECT_ROOT_DIR, LOG_FOLDER)
-    os.makedirs(log_dir, exist_ok=True)

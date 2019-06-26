@@ -7,8 +7,10 @@ import numpy as np
 import scipy.stats
 from functools import total_ordering
 
-import shapSD.pysubgroup as ps
-from shapSD.pysubgroup.subgroup import SubgroupDescription, Subgroup, NominalSelector
+from .measures import AbstractInterestingnessMeasure, BoundedInterestingnessMeasure
+from .utils import effective_sample_size, powerset
+from .subgroup import SubgroupDescription, Subgroup, NominalSelector
+
 
 @total_ordering
 class NominalTarget(object):
@@ -80,10 +82,10 @@ class NominalTarget(object):
         subgroup.statistics['coverage_complement'] = (positives_dataset - positives_subgroup) / positives_dataset
         subgroup.statistics['target_share_sg'] = positives_subgroup / instances_subgroup
         subgroup.statistics['target_share_complement'] = (positives_dataset - positives_subgroup) / (
-                    instances_dataset - instances_subgroup)
+                instances_dataset - instances_subgroup)
         subgroup.statistics['target_share_dataset'] = positives_dataset / instances_dataset
         subgroup.statistics['lift'] = (positives_subgroup / instances_subgroup) / (
-                    positives_dataset / instances_dataset)
+                positives_dataset / instances_dataset)
 
         if weighting_attribute is not None:
             (instances_dataset, positives_dataset, instances_subgroup, positives_subgroup) = \
@@ -99,16 +101,16 @@ class NominalTarget(object):
             (instances_dataset - instances_subgroup) / instances_dataset
         subgroup.statistics['coverage_sg_weighted'] = positives_subgroup / positives_dataset
         subgroup.statistics['coverage_complement_weighted'] = (
-                                                                          positives_dataset - positives_subgroup) / positives_dataset
+                                                                      positives_dataset - positives_subgroup) / positives_dataset
         subgroup.statistics['target_share_sg_weighted'] = positives_subgroup / instances_subgroup
         subgroup.statistics['target_share_complement_weighted'] = (positives_dataset - positives_subgroup) / (
-                    instances_dataset - instances_subgroup)
+                instances_dataset - instances_subgroup)
         subgroup.statistics['target_share_dataset_weighted'] = positives_dataset / instances_dataset
         subgroup.statistics['lift_weighted'] = (positives_subgroup / instances_subgroup) / (
-                    positives_dataset / instances_dataset)
+                positives_dataset / instances_dataset)
 
 
-class ChiSquaredQF(ps.AbstractInterestingnessMeasure):
+class ChiSquaredQF(AbstractInterestingnessMeasure):
     @staticmethod
     def chi_squared_qf(instances_dataset, positives_dataset, instances_subgroup, positives_subgroup, min_instances=5,
                        bidirect=True, direction_positive=True):
@@ -148,7 +150,7 @@ class ChiSquaredQF(ps.AbstractInterestingnessMeasure):
         if (instancesSubgroup < min_instances) or ((instancesDataset - instancesSubgroup) < 5):
             return float("inf")
         if effective_sample_size == 0:
-            effective_sample_size = ps.effective_sample_size(data[weighting_attribute])
+            effective_sample_size = effective_sample_size(data[weighting_attribute])
         # p_subgroup = positivesSubgroup / instancesSubgroup
         # p_dataset = positivesDataset / instancesDataset
 
@@ -183,7 +185,7 @@ class ChiSquaredQF(ps.AbstractInterestingnessMeasure):
             weights = data[weighting_attribute]
             base = self.evaluate_from_statistics(instancesDataset, positivesDataset, instancesSubgroup,
                                                  positivesSubgroup)
-            result = base * ps.effective_sample_size(weights) / instancesDataset
+            result = base * effective_sample_size(weights) / instancesDataset
         return result
 
     def evaluate_from_statistics(self, instances_dataset, positives_dataset, instances_subgroup, positives_subgroup):
@@ -197,7 +199,7 @@ class ChiSquaredQF(ps.AbstractInterestingnessMeasure):
         return isinstance(subgroup.target, NominalTarget)
 
 
-class StandardQF(ps.AbstractInterestingnessMeasure, ps.BoundedInterestingnessMeasure):
+class StandardQF(AbstractInterestingnessMeasure, BoundedInterestingnessMeasure):
     @staticmethod
     def standard_qf(a, instances_dataset, positives_dataset, instances_subgroup, positives_subgroup):
         if instances_subgroup == 0:
@@ -256,7 +258,7 @@ class SimpleBinomial(StandardQF):
 #####
 # GeneralizationAware Interestingness Measures
 #####
-class GAStandardQF(ps.AbstractInterestingnessMeasure):
+class GAStandardQF(AbstractInterestingnessMeasure):
     def __init__(self, a):
         self.a = a
 
@@ -279,7 +281,7 @@ class GAStandardQF(ps.AbstractInterestingnessMeasure):
 
 def get_max_generalization_target_share(data, subgroup, weighting_attribute=None):
     selectors = subgroup.subgroup_description.selectors
-    generalizations = ps.powerset(selectors)
+    generalizations = powerset(selectors)
     max_target_share = 0
     for sels in generalizations:
         sgd = SubgroupDescription(list(sels))

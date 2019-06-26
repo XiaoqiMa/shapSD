@@ -4,7 +4,8 @@ Created on 29.09.2017
 @author: lemmerfn
 '''
 from functools import total_ordering
-import shapSD.pysubgroup as ps
+
+from .measures import AbstractInterestingnessMeasure, BoundedInterestingnessMeasure
 
 
 @total_ordering
@@ -40,7 +41,7 @@ class FITarget(object):
         subgroup.statistics['size_dataset'] = len(data)
 
 
-class CountQF(ps.AbstractInterestingnessMeasure, ps.BoundedInterestingnessMeasure):
+class CountQF(AbstractInterestingnessMeasure, BoundedInterestingnessMeasure):
     def __init__(self):
         pass
 
@@ -64,7 +65,7 @@ class CountQF(ps.AbstractInterestingnessMeasure, ps.BoundedInterestingnessMeasur
         return False
 
 
-class AreaQF(ps.AbstractInterestingnessMeasure):
+class AreaQF(AbstractInterestingnessMeasure):
     def __init__(self):
         pass
 

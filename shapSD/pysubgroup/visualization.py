@@ -6,7 +6,9 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from matplotlib import pyplot as plt
 
-import shapSD.pysubgroup as ps
+from .utils import overlap
+from .numeric_target import StandardQFNumeric
+
 
 def plot_sgbars(result_df, data=None, ylabel="target share", title="Discovered Subgroups", dynamic_widths=False,
                 suffix=""):
@@ -38,7 +40,7 @@ def plot_sgbars(result_df, data=None, ylabel="target share", title="Discovered S
     return fig
 
 
-def plot_roc(result_df, data, qf=ps.StandardQF(0.5), levels=40, annotate=False):
+def plot_roc(result_df, data, qf=StandardQFNumeric(0.5), levels=40, annotate=False):
     instances_dataset = len(data)
     positives_dataset = np.max(result_df['positives_dataset'])
     negatives_dataset = instances_dataset - positives_dataset
@@ -114,7 +116,7 @@ def compare_distributions_numeric(sgs, data, bins):
 def similarity_sgs(sgd_results, data, color=True):
     sgs = [x[1] for x in sgd_results]
     # sgNames = [str(sg.subgroup_description) for sg in sgs]
-    dists = [[ps.overlap(sg, sg2, data) for sg2 in sgs] for sg in sgs]
+    dists = [[overlap(sg, sg2, data) for sg2 in sgs] for sg in sgs]
     dist_df = pd.DataFrame(dists)
     if color:
         dist_df = dist_df.style.background_gradient()

@@ -4,8 +4,11 @@ Created on 29.09.2017
 @author: lemmerfn
 '''
 import numpy as np
-import shapSD.pysubgroup as ps
 from functools import total_ordering
+
+from .measures import AbstractInterestingnessMeasure, BoundedInterestingnessMeasure
+from .utils import conditional_invert, powerset
+from .subgroup import SubgroupDescription, Subgroup
 
 
 @total_ordering
@@ -60,7 +63,7 @@ class NumericTarget(object):
         subgroup.statistics['median_lift'] = subgroup.statistics['median_sg'] / subgroup.statistics['median_dataset']
 
 
-class StandardQFNumeric(ps.AbstractInterestingnessMeasure, ps.BoundedInterestingnessMeasure):
+class StandardQFNumeric(AbstractInterestingnessMeasure, BoundedInterestingnessMeasure):
 
     @staticmethod
     def standard_qf_numeric(a, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
@@ -75,7 +78,7 @@ class StandardQFNumeric(ps.AbstractInterestingnessMeasure, ps.BoundedInteresting
     def evaluate_from_dataset(self, data, subgroup, weighting_attribute=None, cache=None):
         if not self.is_applicable(subgroup):
             raise BaseException("Quality measure cannot be used for this target class")
-        return ps.conditional_invert(
+        return conditional_invert(
             self.evaluate_from_statistics(*subgroup.get_base_statistics(data, weighting_attribute)), self.invert)
 
     def optimistic_estimate_from_dataset(self, data, subgroup):
@@ -86,7 +89,7 @@ class StandardQFNumeric(ps.AbstractInterestingnessMeasure, ps.BoundedInteresting
         mean_dataset = np.mean(all_target_values)
         sg_target_values = all_target_values[sg_instances]
         target_values_larger_than_mean = sg_target_values[sg_target_values > mean_dataset]
-        return ps.conditional_invert(
+        return conditional_invert(
             np.sum(target_values_larger_than_mean) - (len(target_values_larger_than_mean) * mean_dataset), self.invert)
 
     def evaluate_from_statistics(self, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
@@ -104,7 +107,7 @@ class StandardQFNumeric(ps.AbstractInterestingnessMeasure, ps.BoundedInteresting
         return False
 
 
-class GAStandardQFNumeric(ps.AbstractInterestingnessMeasure):
+class GAStandardQFNumeric(AbstractInterestingnessMeasure):
     def __init__(self, a, invert=False):
         self.a = a
         self.invert = invert
@@ -115,7 +118,7 @@ class GAStandardQFNumeric(ps.AbstractInterestingnessMeasure):
             return 0
         max_mean = get_max_generalization_mean(data, subgroup, weighting_attribute)
         relative_size = (instances_subgroup / instances_dataset)
-        return ps.conditional_invert(relative_size ** self.a * (mean_sg - max_mean), self.invert)
+        return conditional_invert(relative_size ** self.a * (mean_sg - max_mean), self.invert)
 
     def supports_weights(self):
         return True
@@ -126,10 +129,10 @@ class GAStandardQFNumeric(ps.AbstractInterestingnessMeasure):
 
 def get_max_generalization_mean(data, subgroup, weighting_attribute=None):
     selectors = subgroup.subgroup_description.selectors
-    generalizations = ps.powerset(selectors)
+    generalizations = powerset(selectors)
     max_mean = 0
     for sels in generalizations:
-        sg = ps.Subgroup(subgroup.target, ps.SubgroupDescription(list(sels)))
+        sg = Subgroup(subgroup.target, SubgroupDescription(list(sels)))
         mean_sg = sg.get_base_statistics(data, weighting_attribute)[3]
         max_mean = max(max_mean, mean_sg)
     return max_mean

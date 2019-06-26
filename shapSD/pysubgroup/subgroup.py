@@ -5,8 +5,8 @@ Created on 28.04.2016
 '''
 import numpy as np
 import pandas as pd
-import shapSD.pysubgroup as ps
 from functools import total_ordering
+from .utils import equal_frequency_discretization
 
 
 @total_ordering
@@ -212,6 +212,7 @@ class Subgroup(object):
     def calculate_corr_statistics(self, data):
         return self.target.calculate_corr_statistics(data, self)
 
+
 def create_selectors(data, nbins=5, intervals_only=True, ignore=None):
     if ignore is None:
         ignore = []
@@ -253,7 +254,7 @@ def create_numeric_selector_for_attribute(data, attr_name, nbins=5, intervals_on
         for val in unique_values:
             numeric_selectors.append(NominalSelector(attr_name, val))
     else:
-        cutpoints = ps.equal_frequency_discretization(data, attr_name, nbins, weighting_attribute)
+        cutpoints = equal_frequency_discretization(data, attr_name, nbins, weighting_attribute)
         if intervals_only:
             old_cutpoint = float("-inf")
             for c in cutpoints:

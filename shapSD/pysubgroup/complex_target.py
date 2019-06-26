@@ -1,11 +1,11 @@
 import numpy as np
-import shapSD.pysubgroup as ps
 from functools import total_ordering
-# from scipy.stats import linregress
 from scipy.stats import pearsonr
-# from scipy.stats import spearmanr
 from scipy.stats import norm
 import warnings
+
+from .measures import CorrelationModelMeasure
+
 warnings.filterwarnings('ignore')
 
 
@@ -93,7 +93,7 @@ class ComplexTarget(object):
         return subgroup.statistics
 
 
-class CorrelationQF(ps.CorrelationModelMeasure):
+class CorrelationQF(CorrelationModelMeasure):
 
     def __init__(self, measure='abs_diff'):
         """
@@ -127,7 +127,7 @@ class CorrelationQF(ps.CorrelationModelMeasure):
                 denominator = np.sqrt(1 / (sg_size - 3) + 1 / (complement_sg_size - 3))
                 z_score = (z - z_bar) / denominator
                 p_value = norm.sf(abs(z_score)) * 2  # twosided
-                print('quality: ', 1-p_value)
+                print('quality: ', 1 - p_value)
                 return 1 - p_value
             else:
                 return 0

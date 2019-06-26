@@ -4,7 +4,7 @@ Created on 28.04.2016
 @author: lemmerfn
 '''
 import numpy as np
-import shapSD.pysubgroup as ps
+from .utils import is_categorical_attribute, overlap
 
 
 class AbstractInterestingnessMeasure(object):
@@ -35,6 +35,7 @@ class CorrelationModelMeasure(object):
 
     def is_applicable(self, subgroup):
         raise Exception('Subgroup is not supported by correlation model')
+
 
 class CombinedInterestingnessMeasure(AbstractInterestingnessMeasure, BoundedInterestingnessMeasure):
     def __init__(self, measures, weights=None):
@@ -80,7 +81,7 @@ def unique_attributes(result_set, data):
     used_attributes = []
     for (q, sg) in result_set:
         atts = sg.subgroup_description.get_attributes()
-        if atts not in used_attributes or all([ps.is_categorical_attribute(data, x) for x in atts]):
+        if atts not in used_attributes or all([is_categorical_attribute(data, x) for x in atts]):
             result.append((q, sg))
             used_attributes.append(atts)
     return result
@@ -124,6 +125,6 @@ def overlap_filter(result_set, data, similarity_level=0.9):
 
 def overlaps_list(sg, list_of_sgs, data, similarity_level=0.9):
     for anotherSG in list_of_sgs:
-        if ps.overlap(sg, anotherSG, data) > similarity_level:
+        if overlap(sg, anotherSG, data) > similarity_level:
             return True
     return False

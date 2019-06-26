@@ -7,9 +7,12 @@ import copy
 import functools
 from heapq import heappush, heappop
 from itertools import islice
-
 import numpy as np
-import shapSD.pysubgroup as ps
+
+from .subgroup import Subgroup, SubgroupDescription
+from .utils import add_if_required, minimum_required_quality, intersect_of_ordered_list
+from .measures import BoundedInterestingnessMeasure
+from .numeric_target import StandardQFNumeric
 
 class SubgroupDiscoveryTask(object):
     '''
@@ -36,7 +39,7 @@ class Apriori(object):
         # init the first level
         next_level_candidates = []
         for sel in task.search_space:
-            next_level_candidates.append(ps.Subgroup(task.target, [sel]))
+            next_level_candidates.append(Subgroup(task.target, [sel]))
 
         # level-wise search
         depth = 1
@@ -46,20 +49,20 @@ class Apriori(object):
             for sg in next_level_candidates:
                 if measure_statistics_based:
                     statistics = sg.get_base_statistics(task.data)
-                    ps.add_if_required(result, sg, task.qf.evaluate_from_statistics(*statistics), task)
+                    add_if_required(result, sg, task.qf.evaluate_from_statistics(*statistics), task)
                     optimistic_estimate = task.qf.optimistic_estimate_from_statistics(*statistics) if isinstance(
-                        task.qf, ps.BoundedInterestingnessMeasure) else float("inf")
+                        task.qf, BoundedInterestingnessMeasure) else float("inf")
                 else:
-                    ps.add_if_required(result, sg, task.qf.evaluate_from_dataset(task.data, sg), task)
+                    add_if_required(result, sg, task.qf.evaluate_from_dataset(task.data, sg), task)
                     optimistic_estimate = task.qf.optimistic_estimate_from_dataset(task.data, sg) if isinstance(task.qf,
-                                                                                                                ps.BoundedInterestingnessMeasure) else float(
+                                                                                                                BoundedInterestingnessMeasure) else float(
                         "inf")
 
                 # optimistic_estimate = task.qf.optimistic_estimate_from_dataset(task.data, sg)
                 # if isinstance(task.qf, m.BoundedInterestingnessMeasure) else float("inf")
                 # quality = task.qf.evaluate_from_dataset(task.data, sg)
                 # ut.add_if_required (result, sg, quality, task)
-                if optimistic_estimate >= ps.minimum_required_quality(result, task):
+                if optimistic_estimate >= minimum_required_quality(result, task):
                     promising_candidates.append(sg.subgroup_description.selectors)
 
             if depth == task.depth:
@@ -74,7 +77,7 @@ class Apriori(object):
                         # check if ALL generalizations are contained in promising_candidates
                         generalization_descriptions = [[x for x in candidate if x != sel] for sel in candidate]
                         if all(g in promising_candidates for g in generalization_descriptions):
-                            next_level_candidates.append(ps.Subgroup(task.target, candidate))
+                            next_level_candidates.append(Subgroup(task.target, candidate))
             depth = depth + 1
 
         result.sort(key=lambda x: x[0], reverse=True)
@@ -94,25 +97,25 @@ class BestFirstSearch(object):
         while queue:
             q, candidate_description = heappop(queue)
             q = -q
-            if q < ps.minimum_required_quality(result, task):
+            if q < minimum_required_quality(result, task):
                 break
 
-            sg = ps.Subgroup(task.target, candidate_description)
+            sg = Subgroup(task.target, candidate_description)
 
             if measure_statistics_based:
                 statistics = sg.get_base_statistics(task.data)
-                ps.add_if_required(result, sg, task.qf.evaluate_from_statistics(*statistics), task)
+                add_if_required(result, sg, task.qf.evaluate_from_statistics(*statistics), task)
                 optimistic_estimate = task.qf.optimistic_estimate_from_statistics(*statistics) if isinstance(task.qf,
-                                                                                                             ps.BoundedInterestingnessMeasure) else float(
+                                                                                                             BoundedInterestingnessMeasure) else float(
                     "inf")
             else:
-                ps.add_if_required(result, sg, task.qf.evaluate_from_dataset(task.data, sg), task)
+                add_if_required(result, sg, task.qf.evaluate_from_dataset(task.data, sg), task)
                 optimistic_estimate = task.qf.optimistic_estimate_from_dataset(task.data, sg) if isinstance(task.qf,
-                                                                                                            ps.BoundedInterestingnessMeasure) else float(
+                                                                                                            BoundedInterestingnessMeasure) else float(
                     "inf")
 
             # compute refinements and fill the queue
-            if len(candidate_description) < task.depth and optimistic_estimate >= ps.minimum_required_quality(result,
+            if len(candidate_description) < task.depth and optimistic_estimate >= minimum_required_quality(result,
                                                                                                               task):
                 # iterate over all selectors that are behind the last selector contained in the evaluated candidate
                 # according to the initial order
@@ -145,7 +148,7 @@ class BeamSearch(object):
             raise RuntimeError('Beam width in the beam search algorithm is smaller than the result set size!')
 
         # init
-        beam = [(0, ps.Subgroup(task.target, []))]
+        beam = [(0, Subgroup(task.target, []))]
         last_beam = None
 
         depth = 0
@@ -158,9 +161,9 @@ class BeamSearch(object):
                     if not sel in new_selectors:
                         try:
                             new_selectors.append(sel)
-                            sg = ps.Subgroup(task.target, new_selectors)
+                            sg = Subgroup(task.target, new_selectors)
                             quality = task.qf.evaluate_from_dataset(task.data, sg)
-                            ps.add_if_required(beam, sg, quality, task, check_for_duplicates=True)
+                            add_if_required(beam, sg, quality, task, check_for_duplicates=True)
                         except Exception:
                             continue
             depth += 1
@@ -177,19 +180,19 @@ class SimpleDFS(object):
         return result
 
     def search_internal(self, task, prefix, modification_set, result, use_optimistic_estimates):
-        sg = ps.Subgroup(task.target, ps.SubgroupDescription(copy.copy(prefix)))
+        sg = Subgroup(task.target, SubgroupDescription(copy.copy(prefix)))
 
         if use_optimistic_estimates and len(prefix) < task.depth and isinstance(task.qf,
-                                                                                ps.BoundedInterestingnessMeasure):
+                                                                                BoundedInterestingnessMeasure):
             optimistic_estimate = task.qf.optimistic_estimate_from_dataset(task.data, sg)
-            if optimistic_estimate <= ps.minimum_required_quality(result, task):
+            if optimistic_estimate <= minimum_required_quality(result, task):
                 return result
 
         if task.qf.supports_weights():
             quality = task.qf.evaluate_from_dataset(task.data, sg, task.weighting_attribute)
         else:
             quality = task.qf.evaluate_from_dataset(task.data, sg)
-        ps.add_if_required(result, sg, quality, task)
+        add_if_required(result, sg, quality, task)
 
         if len(prefix) < task.depth:
             new_modification_set = copy.copy(modification_set)
@@ -229,13 +232,13 @@ class BSD(object):
 
         optimistic_estimate = task.qf.optimistic_estimate_from_statistics(self.pop_size, self.pop_positives, sg_size,
                                                                           sg_positive_count)
-        if optimistic_estimate <= ps.minimum_required_quality(result, task):
+        if optimistic_estimate <= minimum_required_quality(result, task):
             return result
 
-        sg = ps.Subgroup(task.target, copy.copy(prefix))
+        sg = Subgroup(task.target, copy.copy(prefix))
 
         quality = task.qf.evaluate_from_statistics(self.pop_size, self.pop_positives, sg_size, sg_positive_count)
-        ps.add_if_required(result, sg, quality, task)
+        add_if_required(result, sg, quality, task)
 
         if len(prefix) < task.depth:
             new_modification_set = copy.copy(modification_set)
@@ -289,18 +292,18 @@ class TID_SD(object):
         if use_sets:
             positiveInstances = bitset & self.targetBitset
         else:
-            positiveInstances = ps.intersect_of_ordered_list(bitset, self.targetBitset)
+            positiveInstances = intersect_of_ordered_list(bitset, self.targetBitset)
         sgPositiveCount = len(positiveInstances)
 
         optimisticEstimate = task.qf.optimistic_estimate_from_statistics(self.popSize, self.popPositives, sgSize,
                                                                          sgPositiveCount)
-        if (optimisticEstimate <= ps.minimum_required_quality(result, task)):
+        if (optimisticEstimate <= minimum_required_quality(result, task)):
             return result
 
-        sg = ps.Subgroup(task.target, copy.copy(prefix))
+        sg = Subgroup(task.target, copy.copy(prefix))
 
         quality = task.qf.evaluate_from_statistics(self.popSize, self.popPositives, sgSize, sgPositiveCount)
-        ps.add_if_required(result, sg, quality, task)
+        add_if_required(result, sg, quality, task)
 
         if (len(prefix) < task.depth):
             newModificationSet = copy.copy(modificationSet)
@@ -309,7 +312,7 @@ class TID_SD(object):
                 if use_sets:
                     newBitset = bitset & self.bitsets[sel]
                 else:
-                    newBitset = ps.intersect_of_ordered_list(bitset, self.bitsets[sel])
+                    newBitset = intersect_of_ordered_list(bitset, self.bitsets[sel])
                 newModificationSet.pop(0)
                 self.search_internal(task, prefix, newModificationSet, result, newBitset, use_sets)
                 # remove the sel again
@@ -319,7 +322,7 @@ class TID_SD(object):
 
 class DFSNumeric(object):
     def execute(self, task):
-        if not isinstance(task.qf, ps.StandardQFNumeric):
+        if not isinstance(task.qf, StandardQFNumeric):
             NotImplemented("BSD_numeric so far is only implemented for StandardQFNumeric")
         self.pop_size = len(task.data)
         sorted_data = task.data.sort_values(task.target.get_attributes(), ascending=False)
@@ -351,13 +354,13 @@ class DFSNumeric(object):
         qualities = self.f(np.arange(len(target_values_cs)) + 1, mean_values_cs)
         optimistic_estimate = np.max(qualities)
 
-        if optimistic_estimate <= ps.minimum_required_quality(result, task):
+        if optimistic_estimate <= minimum_required_quality(result, task):
             return result
 
-        sg = ps.Subgroup(task.target, copy.copy(prefix))
+        sg = Subgroup(task.target, copy.copy(prefix))
 
         quality = qualities[-1]
-        ps.add_if_required(result, sg, quality, task)
+        add_if_required(result, sg, quality, task)
 
         if len(prefix) < task.depth:
             new_modification_set = copy.copy(modification_set)
