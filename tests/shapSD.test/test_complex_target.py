@@ -1,15 +1,16 @@
-from shapSD.logging_custom import *
-import pysubgroup.pysubgroup as ps
-from shapSD.utils import save_dataframe
-from shapSD.data_encoding import DataEncoder
-from shapSD.model_init import InitializeModel
-from shapSD.shap_ensemble import ShapValues
+import shapSD.pysubgroup as ps
+from shapSD.feature_explainer.utils import save_dataframe
+from shapSD.feature_explainer.data_encoding import DataEncoder
+from shapSD.feature_explainer.model_init import InitializeModel
+from shapSD.feature_explainer.shap_ensemble import ShapValues
+from shapSD.feature_explainer.logging_custom import execution_time_logging
 import pandas as pd
+import time
 
 
 @execution_time_logging
 def test_complex_target(attr):
-    adult = pd.read_csv('../data/adult.csv', index_col=0)
+    adult = pd.read_csv('../../data/adult.csv', index_col=0)
     df_adult = DataEncoder(adult).label_encoding()
     x_train = df_adult.drop('income', axis=1)
     y_train = df_adult['income']

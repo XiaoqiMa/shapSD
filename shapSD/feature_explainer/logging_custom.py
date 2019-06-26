@@ -13,6 +13,7 @@ LOG_FOLDER = "logs"
 log_dir = os.path.join(PROJECT_ROOT_DIR, LOG_FOLDER)
 os.makedirs(log_dir, exist_ok=True)
 
+
 def init_logging(logfile, level=logging.INFO):
     logger = logging.getLogger(logfile)
     if not len(logging.getLogger(logfile).handlers):
@@ -53,4 +54,3 @@ def err_logging(msg):
     logfile = 'logs/err_msg.log'
     logger = init_logging(logfile, level)
     logger.error(msg)
-
