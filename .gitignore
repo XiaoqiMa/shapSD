@@ -8,6 +8,8 @@ doc/_build
 build
 venv
 logs
-notebooks
 imgs
 files
+dist
+shapSD.egg-info
+setup.cfg
