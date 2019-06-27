@@ -15,6 +15,9 @@
 Subgroup Discovery is a well established data mining technique that allows you to identify patterns in your data.
 The goal of subgroup discovery is to identify descriptions of data subsets that show an interesting distribution with respect to a pre-specified target concept.
 
+**shapSD Usage**
+
+[shapSD demonstration](/notebooks/shapSD_demonstration.ipynb)
 
 **The MIT License (MIT)**
 
