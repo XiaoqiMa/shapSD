@@ -25,15 +25,36 @@ class BinaryFlip(object):
         except Exception:
             raise Exception('Model does not support probability prediction')
 
-    def calc_flip_effect(self):
+    def calc_abs_flip_effect(self):
         ori_prediction = self.get_prediction(self.x_train)
         df_flip_effect = self.x_train.copy()
         df_flip_effect[self.flip_attr] = df_flip_effect[self.flip_attr].apply(lambda x: x ^ 1)
         new_prediction = self.get_prediction(df_flip_effect)
 
-        avg_effect = np.mean(np.abs(new_prediction - ori_prediction))
+        attr_name = '{}_abs_effect'.format(self.flip_attr)
+        df_flip_effect[attr_name] = np.abs(new_prediction - ori_prediction)
+        return df_flip_effect
+
+    def calc_flip_effect(self, reverse_direction=False):
+        attr_val1, attr_val2 = self.x_train[self.flip_attr].unique()
+        attr_index1 = self.x_train.loc[self.x_train[self.flip_attr] == attr_val1].index
+        attr_index2 = self.x_train.loc[self.x_train[self.flip_attr] == attr_val2].index
+
+        ori_prediction = self.get_prediction(self.x_train)
+        df_flip_effect = self.x_train.copy()
+        df_flip_effect[self.flip_attr] = df_flip_effect[self.flip_attr].apply(lambda x: x ^ 1)
+        new_prediction = self.get_prediction(df_flip_effect)
+
         attr_name = '{}_effect'.format(self.flip_attr)
-        df_flip_effect[attr_name] = np.abs(new_prediction - ori_prediction) - avg_effect
+        if not reverse_direction:
+            print('{} effect from "{}" to "{}"'.format(self.flip_attr, attr_val1, attr_val2))
+            df_flip_effect[attr_name] = new_prediction - ori_prediction
+            df_flip_effect[attr_name].iloc[attr_index1] = - df_flip_effect[attr_name]
+        else:
+            print('{} effect from "{}" to "{}"'.format(self.flip_attr, attr_val2, attr_val1))
+            df_flip_effect[attr_name] = new_prediction - ori_prediction
+            df_flip_effect[attr_name].iloc[attr_index2] = - df_flip_effect[attr_name]
+
         return df_flip_effect
 
     def calc_flip_shap_values(self):
