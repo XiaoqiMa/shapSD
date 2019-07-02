@@ -11,31 +11,63 @@ from .logging_custom import *
 
 
 class ShapValues(object):
-
-    def __init__(self, x_train, model, explainer=shap.TreeExplainer):
+    # TODO: change explainer input, DeepExplainer(model, data)
+    def __init__(self, x_train, model, explainer_type='Tree'):
+        """
+        Parameters:
+        --------------
+        x_train: dataframe type; input training data
+        model: model that has been fitted on training data
+        explainer_type: str
+                    'Tree': shap TreeExplainer
+                    'Deep': shap DeepExplainer
+        """
         self.x_train = x_train
         self.model = model
-        self.explainer = explainer
+        self.explainer_type = explainer_type
+        if self.explainer_type == 'Tree':
+            self.explainer = shap.TreeExplainer
+        if self.explainer_type == 'Deep':
+            self.explainer = shap.DeepExplainer
 
-    def calc_shap_values(self, attr=None, **kwargs):
+    def calc_shap_values(self, attr=None, background_sample=1000, **kwargs):
         try:
-            exp = self.explainer(self.model, **kwargs)
-            shap_values = exp.shap_values(self.x_train, **kwargs)
-            if isinstance(shap_values, list):
-                shap_v = shap_values[1]
-                if attr is not None:
-                    attr_index = list(self.x_train.columns).index(attr)
-                    shap_v = shap_v[:, attr_index]
-                expected_v = exp.expected_value[1]
-            else:
-                shap_v = shap_values
-                if attr is not None:
-                    attr_index = list(self.x_train.columns).index(attr)
-                    shap_v = shap_v[:, attr_index]
-                expected_v = exp.expected_value
-            return exp, shap_v, expected_v
+            if self.explainer_type == 'Tree':
+                exp = self.explainer(self.model, **kwargs)
+                shap_values = exp.shap_values(self.x_train, **kwargs)
+                if isinstance(shap_values, list):
+                    shap_v = shap_values[1]
+                    if attr is not None:
+                        attr_index = list(self.x_train.columns).index(attr)
+                        shap_v = shap_v[:, attr_index]
+                    expected_v = exp.expected_value[1]
+                else:
+                    shap_v = shap_values
+                    if attr is not None:
+                        attr_index = list(self.x_train.columns).index(attr)
+                        shap_v = shap_v[:, attr_index]
+                    expected_v = exp.expected_value
+                return exp, shap_v, expected_v
+            if self.explainer_type == 'Deep':
+                background = self.x_train.iloc[np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                exp = shap.DeepExplainer(self.model, background)
+                shap_values = exp.shap_values(self.x_train.values)
+                if isinstance(shap_values, list):
+                    shap_v = shap_values[0]
+                    if attr is not None:
+                        attr_index = list(self.x_train.columns).index(attr)
+                        shap_v = shap_v[:, attr_index]
+                    expected_v = exp.expected_value
+                else:
+                    shap_v = shap_values
+                    if attr is not None:
+                        attr_index = list(self.x_train.columns).index(attr)
+                        shap_v = shap_v[:, attr_index]
+                    expected_v = exp.expected_value
+                return exp, shap_v, expected_v
+
         except Exception as err:
-            print('Error: model is not supported by SHAP TreeExplainer')
+            print('Error: model is not supported by SHAP {} Explainer'.format(self.explainer_type))
             err_logging(err)
             raise Exception(err)
 

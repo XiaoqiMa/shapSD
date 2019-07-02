@@ -29,8 +29,8 @@ class TestBinaryFlip(unittest.TestCase):
         prediction = self.b_flip.get_prediction(self.x_train)
         self.assertEqual(len(prediction), len(self.y_train))
 
-    def test_calc_flip_effect(self):
-        df_flip_effect = self.b_flip.calc_flip_effect()
+    def test_calc_abs_flip_effect(self):
+        df_flip_effect = self.b_flip.calc_abs_flip_effect()
         self.assertEqual(len(df_flip_effect.columns), len(self.x_train.columns) + 1)
 
     def test_calc_flip_shap_values(self):
@@ -38,12 +38,12 @@ class TestBinaryFlip(unittest.TestCase):
         self.assertEqual(len(df_flip_shap.columns), len(self.x_train.columns) + 1)
 
     def test_effect_discovery(self):
-        df_flip_effect = self.b_flip.calc_flip_effect()[:1000]
+        df_flip_effect = self.b_flip.calc_abs_flip_effect()[:1000]
         new_adult = self.read_data()[:1000]
         self.assertEqual(df_flip_effect.shape, new_adult.shape)
-        attr_name = '{}_effect'.format(self.flip_attr)
+        attr_name = '{}_abs_effect'.format(self.flip_attr)
         new_adult[attr_name] = df_flip_effect[attr_name]
-        self.assertEqual(attr_name, 'sex_effect')
+        self.assertEqual(attr_name, 'sex_abs_effect')
 
         target = ps.NumericTarget(attr_name)
         search_space = ps.create_selectors(new_adult, ignore=[attr_name, self.flip_attr, 'income'])
