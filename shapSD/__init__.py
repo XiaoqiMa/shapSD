@@ -6,6 +6,7 @@ from .feature_explainer.logging_custom import *
 from .feature_explainer.model_init import InitializeModel
 from .feature_explainer.numeric_perturb import NumericPerturb
 from .feature_explainer.shap_ensemble import ShapValues
+from .feature_explainer.decision_tree_explain import DecisionTreeExplain
 
 from .pysubgroup.algorithms import *
 from .pysubgroup.complex_target import *

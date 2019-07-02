@@ -24,6 +24,14 @@ class DataEncoder(object):
         except:
             raise Exception('Label encoding error')
 
+    def get_labels(self):
+        label_dic = {}
+        data = self.df_data.copy()
+        cat_cols = data.select_dtypes(exclude=['number']).columns
+        for col in cat_cols:
+            label_dic[col] = dict(enumerate(data[col].astype('category').cat.categories))
+        return label_dic
+
     def onehot_encoding(self):
         data = self.df_data.copy()
         return pd.get_dummies(data)
