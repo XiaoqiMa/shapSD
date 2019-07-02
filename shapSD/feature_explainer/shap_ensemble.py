@@ -11,7 +11,6 @@ from .logging_custom import *
 
 
 class ShapValues(object):
-    # TODO: change explainer input, DeepExplainer(model, data)
     def __init__(self, x_train, model, explainer_type='Tree'):
         """
         Parameters:
@@ -21,6 +20,7 @@ class ShapValues(object):
         explainer_type: str
                     'Tree': shap TreeExplainer
                     'Deep': shap DeepExplainer
+                    'Kernel': shap KernelExplainer
         """
         self.x_train = x_train
         self.model = model
@@ -29,43 +29,52 @@ class ShapValues(object):
             self.explainer = shap.TreeExplainer
         if self.explainer_type == 'Deep':
             self.explainer = shap.DeepExplainer
+        if self.explainer_type == 'Kernel':
+            self.explainer = shap.KernelExplainer
 
-    def calc_shap_values(self, attr=None, background_sample=1000, **kwargs):
+    def calc_shap_values(self, attr=None, background_sample=500, **kwargs):
+        exp, shap_values = None, None
+        shap_v, expected_v = None, None
         try:
             if self.explainer_type == 'Tree':
                 exp = self.explainer(self.model, **kwargs)
                 shap_values = exp.shap_values(self.x_train, **kwargs)
-                if isinstance(shap_values, list):
-                    shap_v = shap_values[1]
-                    if attr is not None:
-                        attr_index = list(self.x_train.columns).index(attr)
-                        shap_v = shap_v[:, attr_index]
-                    expected_v = exp.expected_value[1]
-                else:
-                    shap_v = shap_values
-                    if attr is not None:
-                        attr_index = list(self.x_train.columns).index(attr)
-                        shap_v = shap_v[:, attr_index]
-                    expected_v = exp.expected_value
-                return exp, shap_v, expected_v
-            if self.explainer_type == 'Deep':
-                background = self.x_train.iloc[np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
-                exp = shap.DeepExplainer(self.model, background)
-                shap_values = exp.shap_values(self.x_train.values)
-                if isinstance(shap_values, list):
-                    shap_v = shap_values[0]
-                    if attr is not None:
-                        attr_index = list(self.x_train.columns).index(attr)
-                        shap_v = shap_v[:, attr_index]
-                    expected_v = exp.expected_value
-                else:
-                    shap_v = shap_values
-                    if attr is not None:
-                        attr_index = list(self.x_train.columns).index(attr)
-                        shap_v = shap_v[:, attr_index]
-                    expected_v = exp.expected_value
-                return exp, shap_v, expected_v
 
+            if self.explainer_type == 'Deep':
+                background = self.x_train.iloc[
+                    np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                exp = self.explainer(self.model, background, **kwargs)
+                shap_values = exp.shap_values(self.x_train.values)
+
+            if self.explainer_type == 'Kernel':
+                background = self.x_train.iloc[
+                    np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                try:
+                    exp = self.explainer(self.model.predict_proba, background, **kwargs)
+                    shap_values = exp.shap_values(self.x_train.values)
+                except AttributeError:
+                    exp = self.explainer(self.model.predict, background, **kwargs)
+                    shap_values = exp.shap_values(self.x_train.values)
+                except Exception as err:
+                    raise Exception(err)
+
+            if isinstance(shap_values, list):
+                if len(shap_values) == 1:
+                    shap_v = shap_values[0]
+                    expected_v = exp.expected_value[0]
+                if len(shap_values) == 2:
+                    shap_v = shap_values[1]
+                    expected_v = exp.expected_value[1]
+                if attr is not None:
+                    attr_index = list(self.x_train.columns).index(attr)
+                    shap_v = shap_v[:, attr_index]
+            else:
+                shap_v = shap_values
+                if attr is not None:
+                    attr_index = list(self.x_train.columns).index(attr)
+                    shap_v = shap_v[:, attr_index]
+                expected_v = exp.expected_value
+            return exp, shap_v, expected_v
         except Exception as err:
             print('Error: model is not supported by SHAP {} Explainer'.format(self.explainer_type))
             err_logging(err)
@@ -88,10 +97,11 @@ class ShapValues(object):
             raise Exception(err)
 
     @execution_time_logging
-    def shap_force_plot(self, instance_ind=None, instance_interval=None, **kwargs):
+    def shap_force_plot(self, instance_ind=None, instance_interval=None, background_sample=500, **kwargs):
         try:
             shap.initjs()
-            exp, shap_values, expected_value = self.calc_shap_values(**kwargs)
+            exp, shap_values, expected_value = self.calc_shap_values(attr=None, background_sample=background_sample,
+                                                                     **kwargs)
             if instance_ind is not None:
                 return shap.force_plot(expected_value, shap_values[instance_ind],
                                        self.x_train.iloc[instance_ind], **kwargs)
@@ -109,10 +119,11 @@ class ShapValues(object):
             raise Exception(err)
 
     @execution_time_logging
-    def shap_summary_plot(self, plot_type='dot', interaction=False, **kwargs):
+    def shap_summary_plot(self, plot_type='dot', interaction=False, background_sample=500, **kwargs):
         try:
             if not interaction:
-                exp, shap_values, expected_value = self.calc_shap_values(**kwargs)
+                exp, shap_values, expected_value = self.calc_shap_values(attr=None, background_sample=background_sample,
+                                                                         **kwargs)
                 shap.summary_plot(shap_values, self.x_train, plot_type=plot_type, show=False, **kwargs)
                 fig_id = str(time.time()).split('.')[0]
                 save_fig('summary_plot_{}'.format(fig_id))
@@ -129,10 +140,12 @@ class ShapValues(object):
             raise Exception(err)
 
     @execution_time_logging
-    def shap_dependence_plot(self, ind, interaction_index, interaction=False, **kwargs):
+    def shap_dependence_plot(self, ind, interaction_index, interaction=False, background_sample=500, **kwargs):
         try:
             if not interaction:
-                explainer, shap_values, expected_value = self.calc_shap_values(**kwargs)
+                explainer, shap_values, expected_value = self.calc_shap_values(attr=None,
+                                                                               background_sample=background_sample,
+                                                                               **kwargs)
                 shap.dependence_plot(ind=ind, interaction_index=interaction_index,
                                      shap_values=shap_values,
                                      features=self.x_train,
