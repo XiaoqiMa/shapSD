@@ -7,7 +7,7 @@ import numpy as np
 from functools import total_ordering
 
 from .measures import AbstractInterestingnessMeasure, BoundedInterestingnessMeasure
-from .utils import conditional_invert, powerset
+from .utils import conditional_invert, powerset, all_set_combination
 from .subgroup import SubgroupDescription, Subgroup
 
 
@@ -136,3 +136,49 @@ def get_max_generalization_mean(data, subgroup, weighting_attribute=None):
         mean_sg = sg.get_base_statistics(data, weighting_attribute)[3]
         max_mean = max(max_mean, mean_sg)
     return max_mean
+
+
+class IncrementalQFNumeric(AbstractInterestingnessMeasure, BoundedInterestingnessMeasure):
+
+    @staticmethod
+    def standard_qf_numeric(a, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
+        if instances_subgroup == 0:
+            return 0
+        return instances_subgroup ** a * (mean_sg - mean_dataset)
+
+    def __init__(self, a, invert=False):
+        self.a = a
+        self.invert = invert
+
+    def evaluate_from_dataset(self, data, subgroup, weighting_attribute=None, cache=None):
+        if not self.is_applicable(subgroup):
+            raise BaseException("Quality measure cannot be used for this target class")
+        return self.get_mim_generalization_quality(data, subgroup, weighting_attribute)
+
+    def evaluate_from_statistics(self, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
+        return StandardQFNumeric.standard_qf_numeric(self.a, instances_dataset, mean_dataset, instances_subgroup,
+                                                     mean_sg)
+
+    def get_mim_generalization_quality(self, data, subgroup, weighting_attribute=None):
+
+        selectors = subgroup.subgroup_description.selectors
+        generalizations = all_set_combination(selectors)
+        min_quality = self.evaluate_from_statistics(*subgroup.get_base_statistics(data, weighting_attribute))
+        for sels in generalizations:
+            if len(sels) > 1:
+                # create new subgroup datasets
+                sg = Subgroup(subgroup.target, SubgroupDescription(sels))
+                sg_instances = sg.subgroup_description.covers(data)
+                new_data = data.iloc[sg_instances]
+                # get the minimum quality with respect to datasets described by its selectors
+                # e.g min(q(DB[male], subgroup), q(DB[>50], subgroup))
+                sg_quality = self.evaluate_from_statistics(*subgroup.get_base_statistics(new_data, weighting_attribute))
+                min_quality = min(min_quality, sg_quality)
+
+        return min_quality
+
+    def is_applicable(self, subgroup):
+        return isinstance(subgroup.target, NumericTarget)
+
+    def supports_weights(self):
+        return False
