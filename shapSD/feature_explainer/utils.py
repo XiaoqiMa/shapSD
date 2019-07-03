@@ -40,6 +40,4 @@ def save_dataframe(df, file_id, description=None):
         f.write('\n{}\n'.format(description))
     df.to_csv(path, index=None, sep='\t', mode='a')
 
-#
-# if __name__ == '__main__':
-#     init_folder()
+

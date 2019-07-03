@@ -5,6 +5,7 @@ date: 2019.06.24
 """
 
 import pandas as pd
+from sklearn.preprocessing import scale, MinMaxScaler, StandardScaler
 
 
 class DataEncoder(object):
@@ -41,3 +42,18 @@ class DataEncoder(object):
         num_cols = data.select_dtypes(['number']).columns
         data[num_cols] = data[num_cols].apply(lambda x: pd.qcut(x, quantile, duplicates='drop', **kwargs).astype(str))
         return data
+
+    def data_scaling(self, scale_type='scale'):
+        data = self.df_data.copy()
+        try:
+            if scale_type == 'scale':
+                return pd.DataFrame(scale(data), columns=self.df_data.columns)
+            if scale_type == 'min_max':
+                scaler = MinMaxScaler()
+                return pd.DataFrame(scaler.fit_transform(data), columns=self.df_data.columns)
+            if scale_type == 'standard':
+                scaler = StandardScaler()
+                return pd.DataFrame(scaler.fit_transform(data), columns=self.df_data.columns)
+        except Exception as err:
+            print('Scaling type does not support')
+            print(err)
