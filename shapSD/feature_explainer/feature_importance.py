@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 from eli5.sklearn import PermutationImportance
 from sklearn.metrics import mean_squared_log_error
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 from .logging_custom import *
 
 
@@ -67,6 +68,49 @@ class FeatureImportance(object):
             err_logging(err)
             raise Exception(err)
 
+    @staticmethod
+    def plot_importance(df_imp):
+        df_imp.columns = ['Importance', 'Features']
+        plt.figure(figsize=(40, 20))
+        sns.set(font_scale=5)
+        sns.barplot(x="Importance", y="Features", data=df_imp)
+        plt.title('Feature Importance Plot')
+        plt.tight_layout()
+        plt.show()
+
+    @execution_time_logging
+    def vis_perm_importance(self):
+        imp = []
+        try:
+            if hasattr(self.model, 'score'):
+                base_score = self.model.score(self.x_train, self.y_train)
+                for col in self.x_train.columns:
+                    x = self.x_train.copy()
+                    x[col] = np.random.permutation(x[col])
+                    score = self.model.score(x, self.y_train)
+                    imp.append(np.round(base_score - score, 4))
+
+                df_imp = pd.DataFrame(
+                    {'Features': self.x_train.columns, 'Importance': imp})
+                df_imp = df_imp.sort_values('Importance', ascending=False)
+                return self.plot_importance(df_imp)
+            else:
+                base_score = mean_squared_log_error(self.model.predict(self.x_train), self.y_train)
+                for col in self.x_train.columns:
+                    x = self.x_train.copy()
+                    x[col] = np.random.permutation(x[col])
+                    score = mean_squared_log_error(self.model.predict(x), self.y_train)
+                    imp.append(np.round(base_score - score, 4))
+
+                df_imp = pd.DataFrame(
+                    {'Features': self.x_train.columns, 'Importance': imp})
+                df_imp = df_imp.sort_values('Importance', ascending=False)
+                return self.plot_importance(df_imp)
+        except Exception as err:
+            print('Error: model is not supported')
+            err_logging(err)
+            raise Exception(err)
+
     @execution_time_logging
     def eli5_perm_importance(self, **kwargs):
         try:
@@ -76,7 +120,7 @@ class FeatureImportance(object):
             err_logging(err)
             raise AttributeError(err)
 
-    def eli5_weights_importance(self,  **kwargs):
+    def eli5_weights_importance(self, **kwargs):
         """
         Return
         -------------
