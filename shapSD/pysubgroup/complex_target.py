@@ -52,9 +52,12 @@ class ComplexTarget(object):
         sg_mean_x2 = np.mean(sg_target_values_x2)
 
         # pearson correlation
-        sg_corr = pearsonr(sg_target_values_x1, sg_target_values_x2)[0]
-        dataset_corr = pearsonr(all_target_values_x1, all_target_values_x2)[0]
-        sg_complement_corr = pearsonr(sg_complement_x1, sg_complement_x2)[0]
+        try:
+            sg_corr = pearsonr(sg_target_values_x1, sg_target_values_x2)[0]
+            dataset_corr = pearsonr(all_target_values_x1, all_target_values_x2)[0]
+            sg_complement_corr = pearsonr(sg_complement_x1, sg_complement_x2)[0]
+        except ValueError:
+            sg_corr = dataset_corr = sg_complement_corr = 0
 
         # sg_slope = linregress(sg_target_values_x1, sg_target_values_x2).slope
         # dataset_slope = linregress(all_target_values_x1, all_target_values_x2).slope
@@ -87,7 +90,10 @@ class ComplexTarget(object):
         # subgroup.statistics['sg_slope'] = sg_slope
         # subgroup.statistics['dataset_slope'] = dataset_slope
         # subgroup.statistics['complement_sg_slope'] = sg_complement_slope
-        subgroup.statistics['corr_lift'] = subgroup.statistics['sg_corr'] / subgroup.statistics['dataset_corr']
+        try:
+            subgroup.statistics['corr_lift'] = subgroup.statistics['sg_corr'] / subgroup.statistics['dataset_corr']
+        except ZeroDivisionError:
+            subgroup.statistics['corr_lift'] = 0
         # print('sub sta: ', subgroup.statistics)
         # print('type sta: ', type(subgroup.statistics))
         return subgroup.statistics
