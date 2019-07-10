@@ -70,7 +70,7 @@ class FeatureImportance(object):
 
     @staticmethod
     def plot_importance(df_imp):
-        df_imp.columns = ['Importance', 'Features']
+        df_imp.columns = ['Features', 'Importance']
         plt.figure(figsize=(40, 20))
         sns.set(font_scale=5)
         sns.barplot(x="Importance", y="Features", data=df_imp)
