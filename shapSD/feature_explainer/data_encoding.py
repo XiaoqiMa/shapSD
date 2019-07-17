@@ -35,7 +35,7 @@ class DataEncoder(object):
 
     def onehot_encoding(self):
         data = self.df_data.copy()
-        return pd.get_dummies(data)
+        return pd.get_dummies(data, drop_first=True)
 
     def num_discretization(self, quantile=10, **kwargs):
         data = self.df_data.copy()

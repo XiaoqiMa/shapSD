@@ -21,65 +21,7 @@ class FeatureImportance(object):
         self.model = model
 
     @execution_time_logging
-    def raw_perm_importance(self, iteration=10):
-        imp = []
-        imp_var = []
-        try:
-            if hasattr(self.model, 'score'):
-                base_score = self.model.score(self.x_train, self.y_train)
-                for col in self.x_train.columns:
-                    scores = []
-                    for m in range(iteration):
-                        x = self.x_train.copy()
-                        x[col] = np.random.permutation(x[col])
-                        score = self.model.score(x, self.y_train)
-                        scores.append(score)
-                    score_drop_list = np.array(base_score) - np.array(scores)
-                    variance = np.round(np.var(score_drop_list), 6)
-                    score_mean_drop = np.round(np.mean(score_drop_list), 4)
-                    imp.append(score_mean_drop)
-                    imp_var.append('{}±{}'.format(score_mean_drop, variance))
-
-                df_imp = pd.DataFrame(
-                    {'Features': self.x_train.columns, 'Importance': imp, 'Importance weights': imp_var})
-                df_imp = df_imp.sort_values('Importance', ascending=False)
-                return df_imp[['Importance weights', 'Features']]
-            else:
-                base_score = mean_squared_log_error(self.model.predict(self.x_train), self.y_train)
-                for col in self.x_train.columns:
-                    scores = []
-                    for m in range(iteration):
-                        x = self.x_train.copy()
-                        x[col] = np.random.permutation(x[col])
-                        score = mean_squared_log_error(self.model.predict(x), self.y_train)
-                        scores.append(score)
-                    score_rmse_list = np.array(scores) - np.array(base_score)
-                    variance = np.round(np.var(score_rmse_list), 6)
-                    score_rmse_inc = np.round(np.mean(score_rmse_list), 4)
-                    imp.append(score_rmse_inc)
-                    imp_var.append('{}±{}'.format(score_rmse_inc, variance))
-
-                df_imp = pd.DataFrame(
-                    {'Features': self.x_train.columns, 'Importance': imp, 'Importance weights': imp_var})
-                df_imp = df_imp.sort_values('Importance', ascending=False)
-                return df_imp[['Importance weights', 'Features']]
-        except Exception as err:
-            print('Error: model is not supported')
-            err_logging(err)
-            raise Exception(err)
-
-    @staticmethod
-    def plot_importance(df_imp):
-        df_imp.columns = ['Features', 'Importance']
-        plt.figure(figsize=(40, 20))
-        sns.set(font_scale=5)
-        sns.barplot(x="Importance", y="Features", data=df_imp)
-        plt.title('Feature Importance Plot')
-        plt.tight_layout()
-        plt.show()
-
-    @execution_time_logging
-    def vis_perm_importance(self):
+    def permutation_importance(self):
         imp = []
         try:
             if hasattr(self.model, 'score'):
@@ -93,23 +35,57 @@ class FeatureImportance(object):
                 df_imp = pd.DataFrame(
                     {'Features': self.x_train.columns, 'Importance': imp})
                 df_imp = df_imp.sort_values('Importance', ascending=False)
-                return self.plot_importance(df_imp)
+                return df_imp
             else:
                 base_score = mean_squared_log_error(self.model.predict(self.x_train), self.y_train)
                 for col in self.x_train.columns:
                     x = self.x_train.copy()
                     x[col] = np.random.permutation(x[col])
                     score = mean_squared_log_error(self.model.predict(x), self.y_train)
-                    imp.append(np.round(base_score - score, 4))
+                    imp.append(np.round(score - base_score, 4))
 
                 df_imp = pd.DataFrame(
                     {'Features': self.x_train.columns, 'Importance': imp})
                 df_imp = df_imp.sort_values('Importance', ascending=False)
-                return self.plot_importance(df_imp)
+                return df_imp
         except Exception as err:
             print('Error: model is not supported')
             err_logging(err)
             raise Exception(err)
+
+    def model_importance(self):
+        try:
+            if hasattr(self.model, 'feature_importances_'):
+                df_imp = pd.DataFrame(
+                    {'Features': self.x_train.columns,
+                     'Importance': self.model.feature_importances_})
+                df_imp = df_imp.sort_values('Importance', ascending=False)
+                return df_imp
+        except Exception as err:
+            print('Error: model is not supported')
+            err_logging(err)
+            raise Exception(err)
+
+    @staticmethod
+    def vis_perm_importance(df_imp):
+        """
+        visualize the feature importance plot
+        Parameters:
+        ____________
+        df_imp: dataframe type, contains two columns
+                first column: "Features", describing the features
+                second column: "Importance": describing the feature importance score or weights
+        """
+        try:
+            df_imp.columns = ['Features', 'Importance']
+            plt.figure(figsize=(40, 20))
+            sns.set(font_scale=5)
+            sns.barplot(x="Importance", y="Features", data=df_imp)
+            plt.title('Permutation Feature Importance Plot')
+            plt.tight_layout()
+            plt.show()
+        except:
+            raise Exception('DataFrame should contains two columns, Features & Importance Score')
 
     @execution_time_logging
     def eli5_perm_importance(self, **kwargs):
