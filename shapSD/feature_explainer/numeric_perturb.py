@@ -37,6 +37,16 @@ class NumericPerturb(object):
         df_perturb[pred_attr_name] = np.abs(new_prediction - ori_prediction)
         return df_perturb
 
+    def calc_add_effect(self, add_value=10):
+        ori_prediction = self.get_prediction(self.x_train)
+        df_perturb = self.x_train.copy()
+        df_perturb[self.perturb_attr] = df_perturb[self.perturb_attr].apply(lambda x: int(x + add_value))
+        new_prediction = self.get_prediction(df_perturb)
+
+        pred_attr_name = '{}_prediction_change'.format(self.perturb_attr)
+        df_perturb[pred_attr_name] = new_prediction - ori_prediction
+        return df_perturb
+
     def calc_perturb_shap_values(self):
         explainer = shap.TreeExplainer(self.model)
         shap_values = explainer.shap_values(self.x_train)
@@ -45,4 +55,3 @@ class NumericPerturb(object):
         attr_name = '{}_shap_values'.format(self.perturb_attr)
         df_shap_perturb[attr_name] = shap_values[:, attr_index]
         return df_shap_perturb
-
