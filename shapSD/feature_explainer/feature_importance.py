@@ -20,7 +20,7 @@ class FeatureImportance(object):
         self.y_train = y_train
         self.model = model
 
-    @execution_time_logging
+    # @execution_time_logging
     def permutation_importance(self):
         imp = []
         try:
@@ -78,16 +78,16 @@ class FeatureImportance(object):
         """
         try:
             df_imp.columns = ['Features', 'Importance']
-            plt.figure(figsize=(40, 20))
-            sns.set(font_scale=5)
+            plt.figure(figsize=(10, 6))
+            sns.set(font_scale=2)
             sns.barplot(x="Importance", y="Features", data=df_imp)
             plt.title('Permutation Feature Importance Plot')
             plt.tight_layout()
             plt.show()
-        except:
-            raise Exception('DataFrame should contains two columns, Features & Importance Score')
+        except Exception as err:
+            raise Exception('DataFrame should contains two columns, Features & Importance Score \n', err)
 
-    @execution_time_logging
+    # @execution_time_logging
     def eli5_perm_importance(self, **kwargs):
         try:
             perm = PermutationImportance(self.model).fit(self.x_train, self.y_train)

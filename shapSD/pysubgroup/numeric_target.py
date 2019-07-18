@@ -144,7 +144,8 @@ class IncrementalQFNumeric(AbstractInterestingnessMeasure, BoundedInterestingnes
     def standard_qf_numeric(a, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
         if instances_subgroup == 0:
             return 0
-        return instances_subgroup ** a * (mean_sg - mean_dataset)
+        # return instances_subgroup ** a * (mean_sg - mean_dataset)
+        return np.sqrt(instances_subgroup / instances_dataset) * (mean_sg - mean_dataset)
 
     def __init__(self, a, invert=False):
         self.a = a
@@ -156,7 +157,7 @@ class IncrementalQFNumeric(AbstractInterestingnessMeasure, BoundedInterestingnes
         return self.get_mim_generalization_quality(data, subgroup, weighting_attribute)
 
     def evaluate_from_statistics(self, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
-        return StandardQFNumeric.standard_qf_numeric(self.a, instances_dataset, mean_dataset, instances_subgroup,
+        return IncrementalQFNumeric.standard_qf_numeric(self.a, instances_dataset, mean_dataset, instances_subgroup,
                                                      mean_sg)
 
     def get_mim_generalization_quality(self, data, subgroup, weighting_attribute=None):

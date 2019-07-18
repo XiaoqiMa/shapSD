@@ -7,6 +7,10 @@ date: 2019.06.24
 import lightgbm as lgb
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import warnings
+from keras.layers import Dense
+from keras.models import Sequential
+from keras.regularizers import l2
+from keras.callbacks import EarlyStopping
 
 warnings.filterwarnings('ignore')
 
@@ -49,6 +53,18 @@ class InitializeModel(object):
                                   verbose=-1,
                                   random_state=42)
         model.fit(self.x_train, self.y_train, **kwargs)
+        return model
+
+    def keras_nn_model(self, **kwargs):
+        model = Sequential()
+        model.add(Dense(100, activation='relu', input_dim=len(self.x_train), kernel_regularizer=l2(0.01)))
+        model.add(Dense(100, activation='relu', kernel_regularizer=l2(0.01)))
+        model.add(Dense(50, activation='relu', kernel_regularizer=l2(0.01)))
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1)
+        model.fit(self.x_train, self.y_train, epochs=100, batch_size=50, verbose=0,
+                  callbacks=[es], **kwargs)
         return model
 
     # def xgb_clf_model(self, **kwargs):
