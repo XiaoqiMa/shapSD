@@ -1,7 +1,7 @@
 import unittest
 from shapSD.feature_explainer.model_init import *
 from shapSD.feature_explainer.data_encoding import DataEncoder
-from shapSD.feature_explainer.shap_ensemble import ShapValues
+from shapSD.feature_explainer.shap_values import ShapValues
 import warnings
 import pandas as pd
 

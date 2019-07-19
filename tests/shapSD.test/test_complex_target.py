@@ -2,7 +2,7 @@ import shapSD.pysubgroup as ps
 from shapSD.feature_explainer.utils import save_dataframe
 from shapSD.feature_explainer.data_encoding import DataEncoder
 from shapSD.feature_explainer.model_init import InitializeModel
-from shapSD.feature_explainer.shap_ensemble import ShapValues
+from shapSD.feature_explainer.shap_values import ShapValues
 from shapSD.feature_explainer.logging_custom import execution_time_logging
 import pandas as pd
 import time

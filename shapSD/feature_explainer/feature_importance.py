@@ -79,7 +79,7 @@ class FeatureImportance(object):
         try:
             df_imp.columns = ['Features', 'Importance']
             plt.figure(figsize=(10, 6))
-            sns.set(font_scale=2)
+            sns.set(font_scale=1.5)
             sns.barplot(x="Importance", y="Features", data=df_imp)
             plt.title('Permutation Feature Importance Plot')
             plt.tight_layout()

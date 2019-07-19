@@ -3,8 +3,8 @@ Try to inspect variable influence, starting with flipping binary variable
 author: Xiaoqi
 date: 2019.06.24
 """
-import shap
-import numpy as np
+
+from .shap_values import *
 
 
 class BinaryFlip(object):
@@ -57,11 +57,10 @@ class BinaryFlip(object):
 
         return df_flip_effect
 
-    def calc_flip_shap_values(self):
-        explainer = shap.TreeExplainer(self.model)
-        shap_values = explainer.shap_values(self.x_train)
+    def calc_flip_shap_values(self, explainer_type='Tree'):
+        shaper = ShapValues(self.x_train, self.model, explainer_type=explainer_type)
+        exp, shap_v, expected_v = shaper.calc_shap_values(attr=self.flip_attr)
         df_flip_shap = self.x_train.copy()
-        attr_index = list(df_flip_shap.columns).index(self.flip_attr)
         attr_name = '{}_shap_values'.format(self.flip_attr)
-        df_flip_shap[attr_name] = shap_values[:, attr_index]
+        df_flip_shap[attr_name] = shap_v
         return df_flip_shap

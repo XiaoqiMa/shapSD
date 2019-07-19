@@ -82,15 +82,16 @@ class ShapValues(object):
 
     def calc_shap_inter_values(self, **kwargs):
         try:
-            exp = self.explainer(self.model, **kwargs)
-            shap_inter_values = exp.shap_interaction_values(self.x_train, **kwargs)
-            if isinstance(shap_inter_values, list):
-                shap_inter = shap_inter_values[1]
-                expected_v = exp.expected_value[1]
-            else:
-                shap_inter = shap_inter_values
-                expected_v = exp.expected_value
-            return exp, shap_inter, expected_v
+            if self.explainer_type == 'Tree':
+                exp = self.explainer(self.model, **kwargs)
+                shap_inter_values = exp.shap_interaction_values(self.x_train, **kwargs)
+                if isinstance(shap_inter_values, list):
+                    shap_inter = shap_inter_values[1]
+                    expected_v = exp.expected_value[1]
+                else:
+                    shap_inter = shap_inter_values
+                    expected_v = exp.expected_value
+                return exp, shap_inter, expected_v
         except Exception as err:
             print('Error: model is not supported by SHAP TreeExplainer')
             err_logging(err)

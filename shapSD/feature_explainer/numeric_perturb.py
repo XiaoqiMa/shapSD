@@ -3,8 +3,7 @@ Make perturbation on numeric variable, observe prediction changes
 author: Xiaoqi
 date: 2019.06.24
 """
-import shap
-import numpy as np
+from .shap_values import *
 
 
 class NumericPerturb(object):
@@ -47,11 +46,10 @@ class NumericPerturb(object):
         df_perturb[pred_attr_name] = new_prediction - ori_prediction
         return df_perturb
 
-    def calc_perturb_shap_values(self):
-        explainer = shap.TreeExplainer(self.model)
-        shap_values = explainer.shap_values(self.x_train)
+    def calc_perturb_shap_values(self, explainer_type='Tree'):
+        shaper = ShapValues(self.x_train, self.model, explainer_type=explainer_type)
+        exp, shap_v, expected_v = shaper.calc_shap_values(attr=self.perturb_attr)
         df_shap_perturb = self.x_train.copy()
-        attr_index = list(df_shap_perturb.columns).index(self.perturb_attr)
         attr_name = '{}_shap_values'.format(self.perturb_attr)
-        df_shap_perturb[attr_name] = shap_values[:, attr_index]
+        df_shap_perturb[attr_name] = shap_v
         return df_shap_perturb
