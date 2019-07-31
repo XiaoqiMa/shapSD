@@ -27,10 +27,12 @@ class ShapExplain(object):
         self.explainer_type = explainer_type
         if self.explainer_type == 'Tree':
             self.explainer = shap.TreeExplainer
-        if self.explainer_type == 'Deep':
+        elif self.explainer_type == 'Deep':
             self.explainer = shap.DeepExplainer
-        if self.explainer_type == 'Kernel':
+        elif self.explainer_type == 'Kernel':
             self.explainer = shap.KernelExplainer
+        else:
+            raise TypeError('Does not support {} Explainer'.format(self.explainer_type))
 
     def calc_shap_values(self, attr=None, background_sample=500, **kwargs):
         exp, shap_values = None, None
