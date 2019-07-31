@@ -9,9 +9,8 @@ from .shap_explainer import *
 
 class BinaryFlip(object):
 
-    def __init__(self, x_train, y_train, model, flip_attr):
+    def __init__(self, x_train, model, flip_attr):
         self.x_train = x_train
-        self.y_train = y_train
         self.model = model
         self.flip_attr = flip_attr
 

@@ -1,5 +1,7 @@
 from .shap_explainer import ShapExplainer
 from .lime_explainer import LimeExplainer
+from .binary_flip import BinaryFlip
+from .numeric_perturb import NumericPerturb
 
 
 class LocalExplainer(object):
@@ -27,3 +29,17 @@ class LocalExplainer(object):
                                explainer_type='tabular'):
         explainer = LimeExplainer(self.x_train, self.model, explainer_type=explainer_type)
         return explainer.get_explanation_as_df(instance_ind, instance_interval)
+
+    def binary_flip_explanation(self, flip_attr, has_direction=False):
+        explainer = BinaryFlip(self.x_train, self.model, flip_attr)
+        if not has_direction:
+            return explainer.calc_abs_flip_effect()
+        else:
+            return explainer.calc_flip_effect()
+
+    def numeric_perturb_explanation(self, perturb_attr, value_change=None):
+        explainer = NumericPerturb(self.x_train, self.model, perturb_attr)
+        if value_change is not None:
+            return explainer.calc_change_effect(value_change)
+        else:
+            return explainer.calc_perturb_effect()

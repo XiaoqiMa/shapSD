@@ -8,9 +8,8 @@ from .shap_explainer import *
 
 class NumericPerturb(object):
 
-    def __init__(self, x_train, y_train, model, perturb_attr):
+    def __init__(self, x_train, model, perturb_attr):
         self.x_train = x_train
-        self.y_train = y_train
         self.model = model
         self.perturb_attr = perturb_attr
 
@@ -36,10 +35,10 @@ class NumericPerturb(object):
         df_perturb[pred_attr_name] = np.abs(new_prediction - ori_prediction)
         return df_perturb
 
-    def calc_add_effect(self, add_value=10):
+    def calc_change_effect(self, value_change=10):
         ori_prediction = self.get_prediction(self.x_train)
         df_perturb = self.x_train.copy()
-        df_perturb[self.perturb_attr] = df_perturb[self.perturb_attr].apply(lambda x: int(x + add_value))
+        df_perturb[self.perturb_attr] = df_perturb[self.perturb_attr].apply(lambda x: int(x + value_change))
         new_prediction = self.get_prediction(df_perturb)
 
         pred_attr_name = '{}_prediction_change'.format(self.perturb_attr)
