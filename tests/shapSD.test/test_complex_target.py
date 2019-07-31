@@ -2,7 +2,7 @@ import shapSD.pysubgroup as ps
 from shapSD.feature_explainer.utils import save_dataframe
 from shapSD.feature_explainer.data_encoding import DataEncoder
 from shapSD.feature_explainer.model_init import InitializeModel
-from shapSD.feature_explainer.shap_explain import ShapExplain
+from shapSD.feature_explainer.shap_explainer import ShapExplainer
 from shapSD.feature_explainer.logging_custom import execution_time_logging
 import pandas as pd
 import time
@@ -16,7 +16,7 @@ def test_complex_target(attr):
     y_train = df_adult['income']
 
     model = InitializeModel(x_train, y_train).lgb_clf_model()
-    shaper = ShapExplain(x_train, model)
+    shaper = ShapExplainer(x_train, model)
     exp, shap_v, expected_v = shaper.calc_shap_values(attr=attr)
 
     new_adult = adult.copy()[:2000]

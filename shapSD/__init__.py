@@ -5,10 +5,11 @@ from .feature_explainer.feature_importance import FeatureImportance
 from .feature_explainer.logging_custom import *
 from .feature_explainer.model_init import InitializeModel
 from .feature_explainer.numeric_perturb import NumericPerturb
-from .feature_explainer.shap_explain import ShapExplain
+from .feature_explainer.shap_explainer import ShapExplainer
 from .feature_explainer.decision_tree_explain import DecisionTreeExplain
 from .feature_explainer.feature_processing import FeatureProcessing
-from .feature_explainer.lime_explain import LimeExplain
+from .feature_explainer.lime_explainer import LimeExplainer
+from .feature_explainer.local_explainer import LocalExplainer
 
 from .pysubgroup.algorithms import *
 from .pysubgroup.complex_target import *

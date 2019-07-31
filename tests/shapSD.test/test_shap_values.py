@@ -1,7 +1,7 @@
 import unittest
 from shapSD.feature_explainer.model_init import *
 from shapSD.feature_explainer.data_encoding import DataEncoder
-from shapSD.feature_explainer.shap_explain import ShapExplain
+from shapSD.feature_explainer.shap_explainer import ShapExplainer
 import warnings
 import pandas as pd
 
@@ -22,7 +22,7 @@ class TestShapValues(unittest.TestCase):
         self.x_train = df_adult.drop('income', axis=1)
         self.y_train = df_adult['income']
         self.model = InitializeModel(self.x_train, self.y_train).lgb_clf_model()
-        self.shaper = ShapExplain(self.x_train, self.model)
+        self.shaper = ShapExplainer(self.x_train, self.model)
 
     def test_calc_shap_values(self):
         exp, shap_v, expected_v = self.shaper.calc_shap_values()

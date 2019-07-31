@@ -4,7 +4,7 @@ author: Xiaoqi
 date: 2019.06.24
 """
 
-from .shap_explain import *
+from .shap_explainer import *
 
 
 class BinaryFlip(object):
@@ -58,7 +58,7 @@ class BinaryFlip(object):
         return df_flip_effect
 
     def calc_flip_shap_values(self, explainer_type='Tree'):
-        shaper = ShapExplain(self.x_train, self.model, explainer_type=explainer_type)
+        shaper = ShapExplainer(self.x_train, self.model, explainer_type=explainer_type)
         exp, shap_v, expected_v = shaper.calc_shap_values(attr=self.flip_attr)
         df_flip_shap = self.x_train.copy()
         attr_name = '{}_shap_values'.format(self.flip_attr)

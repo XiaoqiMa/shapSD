@@ -3,14 +3,14 @@ calculate shapley values for single instance; plot shapley values
 author: Xiaoqi
 date: 2019.06.24
 """
-import time
 import shap
 import numpy as np
+import pandas as pd
 from .utils import *
 from .logging_custom import *
 
 
-class ShapExplain(object):
+class ShapExplainer(object):
     def __init__(self, x_train, model, explainer_type='Tree'):
         """
         Parameters:
@@ -101,7 +101,23 @@ class ShapExplain(object):
             err_logging(err)
             raise Exception(err)
 
-    @execution_time_logging
+    def get_shap_values_as_df(self, instance_ind=None, instance_interval=None, background_sample=500):
+        exp, shap_values, expected_value = self.calc_shap_values(attr=None, background_sample=background_sample)
+        start = end = 0
+        if instance_ind is not None:
+            start = end = instance_ind
+
+        if isinstance(instance_interval, tuple) or isinstance(instance_interval, list):
+            start = instance_interval[0]
+            end = instance_interval[1]
+
+        df_exp = pd.DataFrame(columns=range(len(self.x_train.columns)))
+        df_exp = pd.concat([df_exp, pd.DataFrame(shap_values[start:end + 1, :])])
+        df_exp.columns = self.x_train.columns
+        df_exp.reset_index(drop=True, inplace=True)
+        return df_exp
+
+    # @execution_time_logging
     def shap_force_plot(self, instance_ind=None, instance_interval=None, background_sample=500, **kwargs):
         try:
             shap.initjs()
@@ -109,21 +125,21 @@ class ShapExplain(object):
                                                                      **kwargs)
             if instance_ind is not None:
                 return shap.force_plot(expected_value, shap_values[instance_ind],
-                                       self.x_train.iloc[instance_ind], **kwargs)
+                                       self.x_train.iloc[instance_ind])
 
-            if isinstance(instance_interval, tuple):
+            if isinstance(instance_interval, tuple) or isinstance(instance_interval, list):
                 start = instance_interval[0]
                 end = instance_interval[1]
-                return shap.force_plot(expected_value, shap_values[start:end, :],
-                                       self.x_train.iloc[start:end, :], **kwargs)
+                return shap.force_plot(expected_value, shap_values[start:end + 1, :],
+                                       self.x_train.iloc[start:end + 1, :])
 
-            return shap.force_plot(expected_value, shap_values, self.x_train, **kwargs)
+            return shap.force_plot(expected_value, shap_values, self.x_train)
         except Exception as err:
             print('Error: model is not supported by SHAP force plot')
             err_logging(err)
             raise Exception(err)
 
-    @execution_time_logging
+    # @execution_time_logging
     def shap_summary_plot(self, plot_type='dot', interaction=False, background_sample=500, **kwargs):
         try:
             if not interaction:
@@ -144,7 +160,7 @@ class ShapExplain(object):
             err_logging(err)
             raise Exception(err)
 
-    @execution_time_logging
+    # @execution_time_logging
     def shap_dependence_plot(self, ind, interaction_index, interaction=False, background_sample=500, **kwargs):
         try:
             if not interaction:
