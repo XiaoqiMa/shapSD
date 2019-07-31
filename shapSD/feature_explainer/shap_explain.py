@@ -10,7 +10,7 @@ from .utils import *
 from .logging_custom import *
 
 
-class ShapValues(object):
+class ShapExplain(object):
     def __init__(self, x_train, model, explainer_type='Tree'):
         """
         Parameters:
@@ -41,14 +41,16 @@ class ShapValues(object):
                 shap_values = exp.shap_values(self.x_train, **kwargs)
 
             if self.explainer_type == 'Deep':
-                background = self.x_train.iloc[
-                    np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                # background = self.x_train.iloc[
+                #     np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                background = shap.kmeans(self.x_train, background_sample)
                 exp = self.explainer(self.model, background, **kwargs)
                 shap_values = exp.shap_values(self.x_train.values)
 
             if self.explainer_type == 'Kernel':
-                background = self.x_train.iloc[
-                    np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                # background = self.x_train.iloc[
+                #     np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
+                background = shap.kmeans(self.x_train, background_sample)
                 try:
                     exp = self.explainer(self.model.predict_proba, background, **kwargs)
                     shap_values = exp.shap_values(self.x_train.values)

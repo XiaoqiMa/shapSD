@@ -32,14 +32,14 @@ class InitializeModel(object):
         return model
 
     def lgb_clf_model(self, **kwargs):
-        model = lgb.LGBMRegressor(max_bin=512,
-                                  learning_rate=0.01,
-                                  n_estimators=500,
-                                  boosting_type="gbdt",
-                                  objective="binary",
-                                  num_leaves=10,
-                                  verbose=-1,
-                                  random_state=42)
+        model = lgb.LGBMClassifier(max_bin=512,
+                                   learning_rate=0.01,
+                                   n_estimators=500,
+                                   boosting_type="gbdt",
+                                   objective="binary",
+                                   num_leaves=10,
+                                   verbose=-1,
+                                   random_state=42)
         model.fit(self.x_train, self.y_train, **kwargs)
         return model
 

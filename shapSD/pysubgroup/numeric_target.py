@@ -145,7 +145,7 @@ class IncrementalQFNumeric(AbstractInterestingnessMeasure, BoundedInterestingnes
         if instances_subgroup == 0:
             return 0
         # return instances_subgroup ** a * (mean_sg - mean_dataset)
-        return np.sqrt(instances_subgroup / instances_dataset) * (mean_sg - mean_dataset)
+        return np.sqrt(instances_subgroup / instances_dataset) * abs(mean_sg - mean_dataset)
 
     def __init__(self, a, invert=False):
         self.a = a
