@@ -2,6 +2,7 @@
 Created on 29.09.2017
 
 @author: lemmerfn
+modified by Xiaoqi
 '''
 import numpy as np
 from functools import total_ordering
@@ -144,8 +145,8 @@ class IncrementalQFNumeric(AbstractInterestingnessMeasure, BoundedInterestingnes
     def standard_qf_numeric(a, instances_dataset, mean_dataset, instances_subgroup, mean_sg):
         if instances_subgroup == 0:
             return 0
-        # return instances_subgroup ** a * (mean_sg - mean_dataset)
-        return np.sqrt(instances_subgroup / instances_dataset) * abs(mean_sg - mean_dataset)
+        return instances_subgroup ** a * (mean_sg - mean_dataset)
+        # return np.sqrt(instances_subgroup / instances_dataset) * abs(mean_sg - mean_dataset)
 
     def __init__(self, a, invert=False):
         self.a = a

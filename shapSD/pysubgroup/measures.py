@@ -2,6 +2,7 @@
 Created on 28.04.2016
 
 @author: lemmerfn
+modified by Xiaoqi
 '''
 import numpy as np
 from .utils import is_categorical_attribute, overlap

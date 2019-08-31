@@ -1,3 +1,9 @@
+"""
+provide data pre-processing methods
+author: Xiaoqi
+date: 2019.06.24
+"""
+
 import pandas as pd
 from matplotlib import colors
 from scipy.stats import spearmanr

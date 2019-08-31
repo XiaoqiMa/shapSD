@@ -1,3 +1,9 @@
+"""
+provide subgroup discovery for complex target
+author: Xiaoqi
+date: 2019.06.30
+"""
+
 import numpy as np
 from functools import total_ordering
 from scipy.stats import pearsonr

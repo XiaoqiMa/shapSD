@@ -1,3 +1,9 @@
+"""
+Provide some utilization functions
+author: Xiaoqi
+date: 2019.06.30
+"""
+
 import os
 import matplotlib.pyplot as plt
 

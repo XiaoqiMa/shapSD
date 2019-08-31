@@ -1,3 +1,9 @@
+"""
+provide local explanation methods
+author: Xiaoqi
+date: 2019.07.30
+"""
+
 from .shap_explainer import ShapExplainer
 from .lime_explainer import LimeExplainer
 from .binary_flip import BinaryFlip

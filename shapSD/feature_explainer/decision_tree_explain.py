@@ -1,3 +1,9 @@
+"""
+provide explanations using decision trees
+author: Xiaoqi
+date: 2019.07.10
+"""
+
 import os
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
