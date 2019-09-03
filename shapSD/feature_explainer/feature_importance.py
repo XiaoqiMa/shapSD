@@ -11,6 +11,7 @@ from sklearn.metrics import mean_squared_log_error
 import matplotlib.pyplot as plt
 import seaborn as sns
 from .logging_custom import *
+from .utils import save_fig
 
 
 class FeatureImportance(object):
@@ -82,8 +83,12 @@ class FeatureImportance(object):
             sns.set(font_scale=1.5)
             sns.barplot(x="Importance", y="Features", data=df_imp)
             plt.title('Permutation Feature Importance Plot')
-            plt.tight_layout()
-            plt.show()
+            # plt.tight_layout()
+            # plt.show()
+
+            fig_id = str(time.time()).split('.')[0]
+            path = save_fig('feature_importance_{}'.format(fig_id))
+            return path
         except Exception as err:
             raise Exception('DataFrame should contains two columns, Features & Importance Score \n', err)
 

@@ -28,6 +28,7 @@ def save_fig(fig_id, tight_layout=True):
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format='png', dpi=300)
+    return path
 
 
 # save files

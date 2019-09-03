@@ -147,14 +147,14 @@ class ShapExplainer(object):
                                                                          **kwargs)
                 shap.summary_plot(shap_values, self.x_train, plot_type=plot_type, show=False, **kwargs)
                 fig_id = str(time.time()).split('.')[0]
-                save_fig('summary_plot_{}'.format(fig_id))
-                return
+                path = save_fig('summary_plot_{}'.format(fig_id))
+                return path
             else:
                 exp, shap_inter_values, expected_value = self.calc_shap_inter_values(**kwargs)
                 shap.summary_plot(shap_inter_values, self.x_train, show=False, **kwargs)
                 fig_id = str(time.time()).split('.')[0]
-                save_fig('inter_summary_plot_{}'.format(fig_id))
-                return
+                path = save_fig('inter_summary_plot_{}'.format(fig_id))
+                return path
         except Exception as err:
             print('Error: model is not supported by SHAP summary plot')
             err_logging(err)
@@ -172,7 +172,8 @@ class ShapExplainer(object):
                                      features=self.x_train,
                                      display_features=self.x_train, show=False, **kwargs)
                 fig_id = str(time.time()).split('.')[0]
-                save_fig('dependence_plot_{}_{}'.format(ind, fig_id))
+                path = save_fig('dependence_plot_{}_{}'.format(ind, fig_id))
+                return path
                 return
             else:
                 explainer, shap_inter_values, expected_value = self.calc_shap_inter_values(**kwargs)
@@ -182,7 +183,8 @@ class ShapExplainer(object):
                                      features=self.x_train,
                                      display_features=self.x_train, show=False, **kwargs)
                 fig_id = str(time.time()).split('.')[0]
-                save_fig('inter_dependence_{}_{}'.format(ind, fig_id))
+                path = save_fig('inter_dependence_{}_{}'.format(ind, fig_id))
+                return path
                 return
 
         except Exception as err:

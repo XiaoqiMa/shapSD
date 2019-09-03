@@ -50,13 +50,15 @@ class LimeExplainer(object):
                                                 feature_names=self.x_train.columns,
                                                 categorical_features=cat_features,
                                                 categorical_names=label_dic,
-                                                discretize_continuous=True)
+                                                discretize_continuous=True,
+                                                sample_around_instance=True)
 
                 return lime_tab_explainer
             else:
                 lime_tab_explainer = tabular_explainer(self.x_train.values,
                                                 feature_names=self.x_train.columns,
-                                                discretize_continuous=True)
+                                                discretize_continuous=True,
+                                                sample_around_instance=True)
                 return lime_tab_explainer
         except Exception as err:
             print('Error: model is not supported by LIME {} Explainer'.format(self.explainer_type))
