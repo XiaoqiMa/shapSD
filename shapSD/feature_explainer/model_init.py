@@ -57,8 +57,7 @@ class InitializeModel(object):
 
     def keras_nn_model(self, **kwargs):
         model = Sequential()
-        model.add(Dense(100, activation='relu', input_dim=len(self.x_train), kernel_regularizer=l2(0.01)))
-        model.add(Dense(100, activation='relu', kernel_regularizer=l2(0.01)))
+        model.add(Dense(100, activation='relu', input_dim=len(self.x_train.columns), kernel_regularizer=l2(0.01)))
         model.add(Dense(50, activation='relu', kernel_regularizer=l2(0.01)))
         model.add(Dense(1, activation='sigmoid'))
         model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])

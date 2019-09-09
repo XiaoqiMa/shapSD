@@ -43,9 +43,8 @@ class ShapExplainer(object):
                 shap_values = exp.shap_values(self.x_train, **kwargs)
 
             if self.explainer_type == 'Deep':
-                # background = self.x_train.iloc[
-                #     np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
-                background = shap.kmeans(self.x_train, background_sample)
+                background = self.x_train.iloc[
+                    np.random.choice(self.x_train.shape[0], background_sample, replace=False)]
                 exp = self.explainer(self.model, background, **kwargs)
                 shap_values = exp.shap_values(self.x_train.values)
 
@@ -83,6 +82,13 @@ class ShapExplainer(object):
             print('Error: model is not supported by SHAP {} Explainer'.format(self.explainer_type))
             err_logging(err)
             raise Exception(err)
+
+    def get_attr_shap_values(self, attr=None):
+        _, shap_v, _ = self.calc_shap_values(attr=attr)
+        col_name = '{}_shap_values'.format(attr)
+        x = self.x_train.copy()
+        x[col_name] = shap_v
+        return x
 
     def calc_shap_inter_values(self, **kwargs):
         try:

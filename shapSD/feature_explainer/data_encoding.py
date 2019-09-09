@@ -12,6 +12,7 @@ class DataEncoder(object):
 
     def __init__(self, df_data):
         self.df_data = df_data
+        self.scaler = None
 
     def label_encoding(self):
         try:
@@ -43,17 +44,27 @@ class DataEncoder(object):
         data[num_cols] = data[num_cols].apply(lambda x: pd.qcut(x, quantile, duplicates='drop', **kwargs).astype(str))
         return data
 
-    def data_scaling(self, scale_type='scale'):
+    def data_scaling(self, scale_type='standard'):
         data = self.df_data.copy()
         try:
-            if scale_type == 'scale':
-                return pd.DataFrame(scale(data), columns=self.df_data.columns)
+            # if scale_type == 'scale':
+            #     return pd.DataFrame(scale(data), columns=self.df_data.columns)
             if scale_type == 'min_max':
-                scaler = MinMaxScaler()
-                return pd.DataFrame(scaler.fit_transform(data), columns=self.df_data.columns)
+                self.scaler = MinMaxScaler()
+                return pd.DataFrame(self.scaler.fit_transform(data), columns=self.df_data.columns)
             if scale_type == 'standard':
-                scaler = StandardScaler()
-                return pd.DataFrame(scaler.fit_transform(data), columns=self.df_data.columns)
+                self.scaler = StandardScaler()
+                return pd.DataFrame(self.scaler.fit_transform(data), columns=self.df_data.columns)
+        except Exception as err:
+            print('Scaling type does not support')
+            print(err)
+
+    def data_scaling_inverse(self, data, scale_type='standard'):
+        try:
+            if scale_type == 'min_max':
+                return pd.DataFrame(self.scaler.inverse_transform(data), columns=data.columns)
+            if scale_type == 'standard':
+                return pd.DataFrame(self.scaler.inverse_transform(data), columns=data.columns)
         except Exception as err:
             print('Scaling type does not support')
             print(err)
