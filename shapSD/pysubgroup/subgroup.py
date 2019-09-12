@@ -237,6 +237,21 @@ def create_nominal_selectors_for_attribute(data, attribute_name):
     return nominal_selectors
 
 
+def create_binary_selectors(data, ignore=None):
+    if ignore is None:
+        ignore = []
+    binary_selectors = []
+    for attr_name in [x for x in data.select_dtypes(include=['bool', 'number']).columns.values if x not in ignore]:
+        binary_selectors.extend(create_binary_selectors_for_attribute(attr_name))
+    return binary_selectors
+
+
+def create_binary_selectors_for_attribute(attribute_name):
+    # only accept when attribute value is 1
+    binary_selectors = [NominalSelector(attribute_name, 1)]
+    return binary_selectors
+
+
 def create_numeric_selectors(data, nbins=5, intervals_only=True, weighting_attribute=None, ignore=None):
     if ignore is None:
         ignore = []
