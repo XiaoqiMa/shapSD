@@ -7,6 +7,8 @@ doc/_build
 .ipynb_checkpoints
 build
 venv
+env
+notebooks
 logs
 imgs
 files

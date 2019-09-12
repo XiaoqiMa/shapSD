@@ -11,3 +11,5 @@ from .feature_processing import *
 from .lime_explainer import *
 from .local_explainer import *
 from .explanation_report import *
+from .text_explainer import *
+from .word_explainer import *

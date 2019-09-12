@@ -17,15 +17,14 @@ class LocalExplainer(object):
         self.model = model
 
     def shap_explanation(self, instance_ind=None, instance_interval=None,
-                         background_sample=500, explainer_type='Tree'):
-        explainer = ShapExplainer(self.x_train, self.model, explainer_type)
-        return explainer.shap_force_plot(instance_ind, instance_interval, background_sample)
+                         background_sample=500, explainer_type='Tree', show_feature_value=True):
+        explainer = ShapExplainer(self.x_train, self.model, explainer_type, background_sample)
+        return explainer.shap_force_plot(instance_ind, instance_interval, show_feature_value)
 
     def shap_values_as_df(self, instance_ind=None, instance_interval=None,
                           background_sample=500, explainer_type='Tree'):
-        explainer = ShapExplainer(self.x_train, self.model, explainer_type)
-        return explainer.get_shap_values_as_df(instance_ind, instance_interval,
-                                               background_sample)
+        explainer = ShapExplainer(self.x_train, self.model, explainer_type, background_sample)
+        return explainer.get_shap_values_as_df(instance_ind, instance_interval)
 
     def lime_explanation(self, instance_ind, num_features=10, explainer_type='tabular'):
         explainer = LimeExplainer(self.x_train, self.model, explainer_type=explainer_type)
