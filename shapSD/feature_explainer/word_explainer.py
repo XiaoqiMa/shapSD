@@ -75,7 +75,7 @@ class WordExplainer(object):
         effect = effect.transpose()
         effect.columns = ['abs_shap_value']
         effect = effect.sort_values('abs_shap_value', ascending=False).head(20)
-        return effect.plot.bar()
+        return effect.plot.barh(figsize=(8, 8), fontsize=20)
 
     def get_word_effect(self, word):
 

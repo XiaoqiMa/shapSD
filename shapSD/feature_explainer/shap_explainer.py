@@ -128,7 +128,7 @@ class ShapExplainer(object):
         return df_exp
 
     # @execution_time_logging
-    def shap_force_plot(self, instance_ind=None, instance_interval=None, show_feature_value=True):
+    def shap_force_plot(self, instance_ind=None, instance_interval=None, show_feature_value=True, feature_names=None):
         try:
             shap.initjs()
             # exp, shap_values, expected_value = self.calc_shap_values(attr=None, background_sample=background_sample,
@@ -139,9 +139,11 @@ class ShapExplainer(object):
                     features = self.x_train.iloc[instance_ind]
                 else:
                     features = None
+                if feature_names is None:
+                    feature_names = self.x_train.columns
                 return shap.force_plot(self.expected_v, self.shap_v[instance_ind],
                                        features=features,
-                                       feature_names=self.x_train.columns)
+                                       feature_names=feature_names)
 
             if isinstance(instance_interval, tuple) or isinstance(instance_interval, list):
                 start = instance_interval[0]
@@ -150,8 +152,10 @@ class ShapExplainer(object):
                     features = self.x_train.iloc[start:end + 1, :]
                 else:
                     features = None
+                if feature_names is None:
+                    feature_names = self.x_train.columns
                 return shap.force_plot(self.expected_v, self.shap_v[start:end + 1, :],
-                                       features=features, feature_names=self.x_train.columns)
+                                       features=features, feature_names=feature_names)
 
             return shap.force_plot(self.expected_v, self.shap_v, self.x_train, feature_names=self.x_train.columns)
         except Exception as err:
@@ -163,8 +167,6 @@ class ShapExplainer(object):
     def shap_summary_plot(self, plot_type='dot', interaction=False):
         try:
             if not interaction:
-                # exp, shap_values, expected_value = self.calc_shap_values(attr=None, background_sample=background_sample,
-                #                                                          )
                 shap.summary_plot(self.shap_v, self.x_train, plot_type=plot_type, show=False)
                 fig_id = str(time.time()).split('.')[0]
                 path = save_fig('summary_plot_{}'.format(fig_id))

@@ -4,31 +4,26 @@ author: Xiaoqi
 date: 2019.07.30
 """
 
-from lime import lime_tabular
-from lime import lime_text
-from lime import lime_image
+from lime.lime_tabular import LimeTabularExplainer
 from .logging_custom import *
 import pandas as pd
 
 
 class LimeExplainer(object):
 
-    def __init__(self, x_train, model, explainer_type='tabular'):
+    def __init__(self, x_train, model, explainer_type='tabular', class_names=None):
         self.x_train = x_train
         self.model = model
         self.explainer_type = explainer_type
+        self.class_names = class_names
+        self.tabular_explainer = None
 
         if self.explainer_type == 'tabular':
-            tabular_explainer = lime_tabular.LimeTabularExplainer
-            self.explainer = self.get_tabular_explainer(tabular_explainer)
-        elif self.explainer_type == 'text':
-            self.explainer = lime_text.LimeTextExplainer
-        elif self.explainer_type == 'image':
-            self.explainer = lime_image.LimeImageExplainer
+            self.tabular_explainer = self.get_tabular_explainer()
         else:
             raise TypeError('Does not support {} explainer'.format(self.explainer_type))
 
-    def get_tabular_explainer(self, tabular_explainer):
+    def get_tabular_explainer(self):
         data = self.x_train.copy()
         # check whether contains categorical features
         cat_cols = data.select_dtypes(exclude=['number']).columns
@@ -46,8 +41,9 @@ class LimeExplainer(object):
                     label_dic[cat_features[i]] = dict(enumerate(self.x_train[col].astype('category').cat.categories))
 
                 self.x_train = data
-                lime_tab_explainer = tabular_explainer(self.x_train.values,
+                lime_tab_explainer = LimeTabularExplainer(self.x_train.values,
                                                 feature_names=self.x_train.columns,
+                                                class_names = self.class_names,
                                                 categorical_features=cat_features,
                                                 categorical_names=label_dic,
                                                 discretize_continuous=True,
@@ -55,8 +51,9 @@ class LimeExplainer(object):
 
                 return lime_tab_explainer
             else:
-                lime_tab_explainer = tabular_explainer(self.x_train.values,
+                lime_tab_explainer = LimeTabularExplainer(self.x_train.values,
                                                 feature_names=self.x_train.columns,
+                                                class_names = self.class_names,
                                                 discretize_continuous=True,
                                                 sample_around_instance=True)
                 return lime_tab_explainer
@@ -73,11 +70,11 @@ class LimeExplainer(object):
         else:
             raise AttributeError('Does not support model prediction function')
 
-        exp = self.explainer.explain_instance(self.x_train.iloc[instance_ind], predict_f,
+        exp = self.tabular_explainer.explain_instance(self.x_train.iloc[instance_ind], predict_f,
                                                            num_features=num_features)
         return exp
 
-    def lime_explain_instance(self, instance_ind, num_features=10):
+    def show_lime_instance_explanation(self, instance_ind, num_features=10):
 
         exp = self.get_instance_explanation(instance_ind, num_features)
         return exp.show_in_notebook(show_table=True, show_all=all)
