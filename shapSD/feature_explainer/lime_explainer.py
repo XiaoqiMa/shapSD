@@ -77,6 +77,13 @@ class LimeExplainer(object):
     def show_lime_instance_explanation(self, instance_ind, num_features=10):
 
         exp = self.get_instance_explanation(instance_ind, num_features)
+        try:
+            fig_id = str(time.time()).split('.')[0]
+            path = './imgs/lime_plot_{}.html'.format(fig_id)
+            exp.save_to_file(path, show_table=True, show_all=all)
+            print('Saving file: ', path)
+        except:
+            os.makedirs('imgs', exist_ok=True)
         return exp.show_in_notebook(show_table=True, show_all=all)
 
     def get_explanation_as_df(self, instance_ind=None, instance_interval=None):

@@ -3,7 +3,7 @@ provide local explanation methods
 author: Xiaoqi
 date: 2019.07.30
 """
-
+import pandas as pd
 from .shap_explainer import ShapExplainer
 from .lime_explainer import LimeExplainer
 from .binary_flip import BinaryFlip
@@ -47,16 +47,26 @@ class LocalExplainer(object):
         explainer = LimeExplainer(self.x_train, self.model, explainer_type=explainer_type, class_names=class_names)
         return explainer.get_explanation_as_df(instance_ind, instance_interval)
 
-    def binary_flip_explanation(self, flip_attr, has_direction=False):
+    def binary_flip_explanation(self, flip_attr, has_direction=False, instance_ind=None):
         explainer = BinaryFlip(self.x_train, self.model, flip_attr)
         if not has_direction:
-            return explainer.calc_abs_flip_effect()
+            df_effect = explainer.calc_abs_flip_effect()
         else:
-            return explainer.calc_flip_effect()
+            df_effect = explainer.calc_flip_effect()
 
-    def numeric_perturb_explanation(self, perturb_attr, value_change=None):
+        if instance_ind is not None:
+            return pd.DataFrame([df_effect.iloc[instance_ind]])
+        else:
+            return df_effect
+
+    def numeric_perturb_explanation(self, perturb_attr, value_change=None, instance_ind=None):
         explainer = NumericPerturb(self.x_train, self.model, perturb_attr)
         if value_change is not None:
-            return explainer.calc_change_effect(value_change)
+            df_effect = explainer.calc_change_effect(value_change)
         else:
-            return explainer.calc_perturb_effect()
+            df_effect = explainer.calc_perturb_effect()
+
+        if instance_ind is not None:
+            return pd.DataFrame([df_effect.iloc[instance_ind]])
+        else:
+            return df_effect

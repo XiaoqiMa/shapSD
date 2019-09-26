@@ -16,7 +16,10 @@ class NumericPerturb(object):
     def get_prediction(self, x_train):
         try:
             predictions = self.model.predict_proba(x_train)  # classification task
-            return predictions[:, 0]
+            if predictions.shape[1] > 1:
+                return predictions[:, 1]
+            else:
+                return predictions[:, 0]
         except AttributeError:
             predictions = self.model.predict(x_train)  # regression task
             return predictions
@@ -38,7 +41,7 @@ class NumericPerturb(object):
     def calc_change_effect(self, value_change=10):
         ori_prediction = self.get_prediction(self.x_train)
         df_perturb = self.x_train.copy()
-        df_perturb[self.perturb_attr] = df_perturb[self.perturb_attr].apply(lambda x: int(x + value_change))
+        df_perturb[self.perturb_attr] = df_perturb[self.perturb_attr].apply(lambda x: float(x + value_change))
         new_prediction = self.get_prediction(df_perturb)
 
         pred_attr_name = '{}_prediction_change'.format(self.perturb_attr)
@@ -47,8 +50,5 @@ class NumericPerturb(object):
 
     def calc_perturb_shap_values(self, explainer_type='Tree'):
         shaper = ShapExplainer(self.x_train, self.model, explainer_type=explainer_type)
-        exp, shap_v, expected_v = shaper.calc_shap_values(attr=self.perturb_attr)
-        df_shap_perturb = self.x_train.copy()
-        attr_name = '{}_shap_values'.format(self.perturb_attr)
-        df_shap_perturb[attr_name] = shap_v
+        df_shap_perturb = shaper.get_attr_shap_values(attr=self.perturb_attr)
         return df_shap_perturb
