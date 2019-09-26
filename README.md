@@ -34,21 +34,21 @@ Subgroup Discovery is a well established data mining technique that allows you t
 
 - **Tabular Data**:
 
-[Case study: Breast Cancer](/doc/03-Case Study Breast Cancer dataset.ipynb)
+[Case study: Breast Cancer](https://github.com/XiaoqiMa/shapSD/doc/03-Case Study Breast Cancer dataset.ipynb)
 
-[Case study: Adult Income](/doc/04-Case Study Adult dataset.ipynb)
+[Case study: Adult Income](https://github.com/XiaoqiMa/shapSD/doc/04-Case Study Adult dataset.ipynb)
 
-[Comparison of decision tree and subgroup discovery](/doc/02-Comparison between decision tree and subgroup discovery.ipynb)
+[Comparison of decision tree and subgroup discovery](https://github.com/XiaoqiMa/shapSD/doc/02-Comparison between decision tree and subgroup discovery.ipynb)
 
 - **Text Data**:
 
-[Case study: Amazon Review](/doc/05-Amazon review explanation.ipynb)
+[Case study: Amazon Review](https://github.com/XiaoqiMa/shapSD/doc/05-Amazon review explanation.ipynb)
 
-[Case study: Review sentiment](/doc/06-Review sentiment explanation.ipynb)
+[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/doc/06-Review sentiment explanation.ipynb)
 
 - **Neural Networks**:
 
-[Case study: Review sentiment](/doc/07-Neural Networks.ipynb)
+[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/doc/07-Neural Networks.ipynb)
 
 **The MIT License (MIT)**
 
