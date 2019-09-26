@@ -34,21 +34,22 @@ Subgroup Discovery is a well established data mining technique that allows you t
 
 - **Tabular Data**:
 
-[Case study: Breast Cancer](https://github.com/XiaoqiMa/shapSD/doc/03-Case Study Breast Cancer dataset.ipynb)
+[Case study: Breast Cancer](https://github.com/XiaoqiMa/shapSD/blob/master/doc/03-Case%20Study%20Breast%20Cancer%20dataset.ipynb)
 
-[Case study: Adult Income](https://github.com/XiaoqiMa/shapSD/doc/04-Case Study Adult dataset.ipynb)
+[Case study: Adult Income](https://github.com/XiaoqiMa/shapSD/blob/master/doc/04-Case%20Study%20Adult%20dataset.ipynb)
 
-[Comparison of decision tree and subgroup discovery](https://github.com/XiaoqiMa/shapSD/doc/02-Comparison between decision tree and subgroup discovery.ipynb)
+[Comparison of decision tree and subgroup discovery](https://github.com/XiaoqiMa/shapSD/blob/master/doc/02-Comparison%20between%20decision%20tree%20and%20subgroup%20discovery.ipynb)
 
 - **Text Data**:
 
-[Case study: Amazon Review](https://github.com/XiaoqiMa/shapSD/doc/05-Amazon review explanation.ipynb)
+[Case study: Amazon Review](https://github.com/XiaoqiMa/shapSD/blob/master/doc/05-Amazon%20review%20explanation.ipynb)
 
-[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/doc/06-Review sentiment explanation.ipynb)
+[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/blob/master/doc/06-Review%20sentiment%20explanation.ipynb)
 
 - **Neural Networks**:
 
-[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/doc/07-Neural Networks.ipynb)
+[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/blob/master/doc/07-Neural%20Networks.ipynb)
+
 
 **The MIT License (MIT)**
 
