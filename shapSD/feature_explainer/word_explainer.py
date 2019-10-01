@@ -38,7 +38,7 @@ class WordExplainer(object):
             index_to_cat[i] = cleand_cat_list
             all_cat += cleand_cat_list
 
-        common_cat = [i[0] for i in Counter(all_cat).most_common(50)]
+        common_cat = [i[0] for i in Counter(all_cat).most_common(100)]
         common_cat = sorted(common_cat)
         return index_to_cat, common_cat
 
@@ -74,8 +74,8 @@ class WordExplainer(object):
         effect = pd.DataFrame([self.shap_values.abs().sum()])
         effect = effect.transpose()
         effect.columns = ['abs_shap_value']
-        effect = effect.sort_values('abs_shap_value', ascending=False).head(20)
-        return effect.plot.barh(figsize=(8, 8), fontsize=20)
+        effect = effect.sort_values('abs_shap_value', ascending=False).head(30)
+        return effect.plot.barh(figsize=(8, 8), fontsize=15)
 
     def get_word_effect(self, word):
 

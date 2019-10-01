@@ -28,15 +28,47 @@ complex_statistics = ('sg_size', 'dataset_size', 'complement_sg_size', 'sg_corr'
                       'dataset_corr', 'complement_sg_corr', 'corr_lift',)
 
 
-def add_if_required(result, sg, quality, task, check_for_duplicates=False):
-    if quality > task.min_quality:
-        if check_for_duplicates and (quality, sg) in result:
-            return
-        if len(result) < task.result_set_size:
-            heappush(result, (quality, sg))
-        elif quality > result[0][0]:
-            heappop(result)
-            heappush(result, (quality, sg))
+# modified
+def add_if_required(result, sg, quality, task, check_for_duplicates=False, inverse_effect=False, statistic_is_positive=True):
+    if statistic_is_positive:
+        if not inverse_effect:
+            if quality > task.min_quality:
+                if check_for_duplicates and (quality, sg) in result:
+                    return
+                if len(result) < task.result_set_size:
+                    heappush(result, (quality, sg))
+                elif quality > result[0][0]:
+                    heappop(result)
+                    heappush(result, (quality, sg))
+        else:
+            if quality < task.max_quality:
+                if check_for_duplicates and (quality, sg) in result:
+                    return
+                if len(result) < task.result_set_size:
+                    heappush(result, (quality, sg))
+                elif abs(quality) > abs(result[0][0]):
+                    heappop(result)
+                    heappush(result, (quality, sg))
+
+    else:
+        if not inverse_effect:
+            if quality < task.max_quality:
+                if check_for_duplicates and (quality, sg) in result:
+                    return
+                if len(result) < task.result_set_size:
+                    heappush(result, (quality, sg))
+                elif abs(quality) > abs(result[0][0]):
+                    heappop(result)
+                    heappush(result, (quality, sg))
+        else:
+            if quality > task.min_quality:
+                if check_for_duplicates and (quality, sg) in result:
+                    return
+                if len(result) < task.result_set_size:
+                    heappush(result, (quality, sg))
+                elif quality > result[0][0]:
+                    heappop(result)
+                    heappush(result, (quality, sg))
 
 
 def minimum_required_quality(result, task):

@@ -14,13 +14,14 @@ from .utils import add_if_required, minimum_required_quality, intersect_of_order
 from .measures import BoundedInterestingnessMeasure
 from .numeric_target import StandardQFNumeric
 
+
 class SubgroupDiscoveryTask(object):
     '''
     Capsulates all parameters required to perform standard subgroup discovery 
     '''
 
     def __init__(self, data, target, search_space, qf, result_set_size=10, depth=3, min_quality=0,
-                 weighting_attribute=None):
+                 max_quality=0, weighting_attribute=None):
         self.data = data
         self.target = target
         self.search_space = search_space
@@ -28,6 +29,7 @@ class SubgroupDiscoveryTask(object):
         self.result_set_size = result_set_size
         self.depth = depth
         self.min_quality = min_quality
+        self.max_quality = max_quality
         self.weighting_attribute = weighting_attribute
 
 
@@ -116,7 +118,7 @@ class BestFirstSearch(object):
 
             # compute refinements and fill the queue
             if len(candidate_description) < task.depth and optimistic_estimate >= minimum_required_quality(result,
-                                                                                                              task):
+                                                                                                           task):
                 # iterate over all selectors that are behind the last selector contained in the evaluated candidate
                 # according to the initial order
                 index_of_last_selector = min(task.search_space.index(candidate_description[-1]),
@@ -138,7 +140,7 @@ class BeamSearch(object):
         self.beam_width = beam_width
         self.beam_width_adaptive = beam_width_adaptive
 
-    def execute(self, task):
+    def execute(self, task, inverse_effect=False, statistic_is_positive=True):
         # adapt beam width to the result set size if desired
         if self.beam_width_adaptive:
             self.beam_width = task.result_set_size
@@ -163,13 +165,15 @@ class BeamSearch(object):
                             new_selectors.append(sel)
                             sg = Subgroup(task.target, new_selectors)
                             quality = task.qf.evaluate_from_dataset(task.data, sg)
-                            add_if_required(beam, sg, quality, task, check_for_duplicates=True)
+                            add_if_required(beam, sg, quality, task, check_for_duplicates=True,
+                                            inverse_effect=inverse_effect,
+                                            statistic_is_positive=statistic_is_positive)
                         except Exception:
                             continue
             depth += 1
 
         result = beam[:task.result_set_size]
-        result.sort(key=lambda x: x[0], reverse=True)
+        result.sort(key=lambda x: abs(x[0]), reverse=True)
         return result
 
 
