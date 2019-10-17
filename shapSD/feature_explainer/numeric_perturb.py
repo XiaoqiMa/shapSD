@@ -26,17 +26,17 @@ class NumericPerturb(object):
         except Exception:
             raise Exception('Model does not support probability prediction')
 
-    def calc_perturb_effect(self):
-        ori_prediction = self.get_prediction(self.x_train)
-        df_perturb = self.x_train.copy()
-        df_perturb[self.perturb_attr] = np.random.permutation(df_perturb[self.perturb_attr].values)
-        new_prediction = self.get_prediction(df_perturb)
-
-        attr_name = '{}_change'.format(self.perturb_attr)
-        pred_attr_name = '{}_prediction_change'.format(self.perturb_attr)
-        df_perturb[attr_name] = np.abs(df_perturb[self.perturb_attr] - self.x_train[self.perturb_attr])
-        df_perturb[pred_attr_name] = np.abs(new_prediction - ori_prediction)
-        return df_perturb
+    # def calc_perturb_effect(self):
+    #     ori_prediction = self.get_prediction(self.x_train)
+    #     df_perturb = self.x_train.copy()
+    #     df_perturb[self.perturb_attr] = np.random.permutation(df_perturb[self.perturb_attr].values)
+    #     new_prediction = self.get_prediction(df_perturb)
+    #
+    #     attr_name = '{}_change'.format(self.perturb_attr)
+    #     pred_attr_name = '{}_prediction_change'.format(self.perturb_attr)
+    #     df_perturb[attr_name] = np.abs(df_perturb[self.perturb_attr] - self.x_train[self.perturb_attr])
+    #     df_perturb[pred_attr_name] = np.abs(new_prediction - ori_prediction)
+    #     return df_perturb
 
     def calc_change_effect(self, value_change=10):
         ori_prediction = self.get_prediction(self.x_train)
@@ -44,6 +44,8 @@ class NumericPerturb(object):
         df_perturb[self.perturb_attr] = df_perturb[self.perturb_attr].apply(lambda x: float(x + value_change))
         new_prediction = self.get_prediction(df_perturb)
 
+        df_perturb['old_prediction'] = ori_prediction
+        df_perturb['new_prediction'] = new_prediction
         pred_attr_name = '{}_prediction_change'.format(self.perturb_attr)
         df_perturb[pred_attr_name] = new_prediction - ori_prediction
         return df_perturb

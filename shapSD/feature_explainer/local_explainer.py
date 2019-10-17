@@ -59,13 +59,9 @@ class LocalExplainer(object):
         else:
             return df_effect
 
-    def numeric_perturb_explanation(self, perturb_attr, value_change=None, instance_ind=None):
+    def numeric_perturb_explanation(self, perturb_attr, value_change=10, instance_ind=None):
         explainer = NumericPerturb(self.x_train, self.model, perturb_attr)
-        if value_change is not None:
-            df_effect = explainer.calc_change_effect(value_change)
-        else:
-            df_effect = explainer.calc_perturb_effect()
-
+        df_effect = explainer.calc_change_effect(value_change)
         if instance_ind is not None:
             return pd.DataFrame([df_effect.iloc[instance_ind]])
         else:

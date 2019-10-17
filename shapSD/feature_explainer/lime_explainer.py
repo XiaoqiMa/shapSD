@@ -77,6 +77,7 @@ class LimeExplainer(object):
     def show_lime_instance_explanation(self, instance_ind, num_features=10):
 
         exp = self.get_instance_explanation(instance_ind, num_features)
+        print('R2 score: ', exp.score)
         try:
             fig_id = str(time.time()).split('.')[0]
             path = './imgs/lime_plot_{}.html'.format(fig_id)

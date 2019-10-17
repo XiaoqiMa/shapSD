@@ -70,14 +70,8 @@ class ShapExplainer(object):
                 if len(shap_values) == 2:
                     shap_v = shap_values[1]
                     expected_v = exp.expected_value[1]
-                # if attr is not None:
-                #     attr_index = list(self.x_train.columns).index(attr)
-                #     shap_v = shap_v[:, attr_index]
             else:
                 shap_v = shap_values
-                # if attr is not None:
-                #     attr_index = list(self.x_train.columns).index(attr)
-                #     shap_v = shap_v[:, attr_index]
                 expected_v = exp.expected_value
             return exp, shap_v, expected_v
         except Exception as err:

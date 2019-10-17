@@ -10,7 +10,6 @@ from .feature_explainer.decision_tree_explain import DecisionTreeExplain
 from .feature_explainer.feature_processing import FeatureProcessing
 from .feature_explainer.lime_explainer import LimeExplainer
 from .feature_explainer.local_explainer import LocalExplainer
-from .feature_explainer.explanation_report import ExplanationReport
 from .feature_explainer.text_explainer import *
 from .feature_explainer.word_explainer import WordExplainer
 
