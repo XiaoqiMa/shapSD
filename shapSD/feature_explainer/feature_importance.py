@@ -23,6 +23,9 @@ class FeatureImportance(object):
 
     # @execution_time_logging
     def permutation_importance(self):
+        """
+        Return: raw implementation of permutation importance measure
+        """
         imp = []
         try:
             if hasattr(self.model, 'score'):
@@ -94,6 +97,11 @@ class FeatureImportance(object):
 
     # @execution_time_logging
     def eli5_perm_importance(self, **kwargs):
+        """
+        Return
+        -----------------
+        permutation importance implemented in ELI5
+        """
         try:
             perm = PermutationImportance(self.model).fit(self.x_train, self.y_train)
             return eli5.show_weights(perm, feature_names=self.x_train.columns.tolist(), **kwargs)
@@ -116,12 +124,12 @@ class FeatureImportance(object):
             err_logging(err)
             raise Exception(err)
 
-    def eli5_instance_importance(self, instance, **kwargs):
-        try:
-            prediction = eli5.show_prediction(self.model, instance, show_feature_values=True,
-                                              feature_names=list(self.x_train.columns), **kwargs)
-            return prediction
-        except Exception as err:
-            print('Error: model is not supported')
-            err_logging(err)
-            raise Exception(err)
+    # def eli5_instance_importance(self, instance, **kwargs):
+    #     try:
+    #         prediction = eli5.show_prediction(self.model, instance, show_feature_values=True,
+    #                                           feature_names=list(self.x_train.columns), **kwargs)
+    #         return prediction
+    #     except Exception as err:
+    #         print('Error: model is not supported')
+    #         err_logging(err)
+    #         raise Exception(err)

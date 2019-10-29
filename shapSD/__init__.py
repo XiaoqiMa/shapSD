@@ -12,6 +12,7 @@ from .feature_explainer.lime_explainer import LimeExplainer
 from .feature_explainer.local_explainer import LocalExplainer
 from .feature_explainer.text_explainer import *
 from .feature_explainer.word_explainer import WordExplainer
+from .feature_explainer.global_explainer import GlobalExplainer
 
 from .pysubgroup.algorithms import *
 from .pysubgroup.complex_target import *
