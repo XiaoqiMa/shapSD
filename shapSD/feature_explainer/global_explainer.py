@@ -10,6 +10,12 @@ from .shap_explainer import ShapExplainer
 class GlobalExplainer(object):
 
     def __init__(self, x_train, y_train, model):
+        """
+        Initialize a feature global explainer
+        :param x_train: input data
+        :param y_train: output data
+        :param model: the underlying black-box model to be interpreted
+        """
         self.x_train = x_train
         self.y_train = y_train
         self.model = model

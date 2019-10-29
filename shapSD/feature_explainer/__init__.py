@@ -13,3 +13,4 @@ from .local_explainer import *
 from .text_explainer import *
 from .word_explainer import *
 from .global_explainer import *
+from .pattern_explainer import *

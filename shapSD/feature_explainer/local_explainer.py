@@ -14,6 +14,11 @@ from .text_explainer import text_explanation_with_lime, text_shap_explainer, tex
 class LocalExplainer(object):
 
     def __init__(self, x_train, model):
+        """
+        Initialize a feature local explainer
+        :param x_train: input data
+        :param model: the underlying black-box model to be interpreted
+        """
         self.x_train = x_train
         self.model = model
 
