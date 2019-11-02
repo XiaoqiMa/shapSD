@@ -40,6 +40,18 @@ class FeatureImportance(object):
                     {'Features': self.x_train.columns, 'Importance': imp})
                 df_imp = df_imp.sort_values('Importance', ascending=False)
                 return df_imp
+            elif hasattr(self.model, 'evaluate'):
+                base_score = self.model.evaluate(self.x_train, self.y_train)[1]
+                for col in self.x_train.columns:
+                    x = self.x_train.copy()
+                    x[col] = np.random.permutation(x[col])
+                    score = self.model.evaluate(x, self.y_train)[1]
+                    imp.append(np.round(base_score - score, 4))
+
+                df_imp = pd.DataFrame(
+                    {'Features': self.x_train.columns, 'Importance': imp})
+                df_imp = df_imp.sort_values('Importance', ascending=False)
+                return df_imp
             else:
                 base_score = mean_squared_log_error(self.model.predict(self.x_train), self.y_train)
                 for col in self.x_train.columns:

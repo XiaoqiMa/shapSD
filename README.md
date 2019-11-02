@@ -4,8 +4,6 @@
 
 ### Global Interpretation methods
 
-- **Partial Dependence Plot (PDP)**
-    - show the marginal effect of a feature on the model predictions
 - **Permutation feature importance**
     - measured by by the drop of prediction accuracy of the model after permuting the selected feature
 - **SHAP feature importance**
