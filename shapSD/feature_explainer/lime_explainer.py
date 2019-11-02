@@ -7,6 +7,7 @@ date: 2019.07.30
 from lime.lime_tabular import LimeTabularExplainer
 from .logging_custom import *
 import pandas as pd
+import numpy as np
 
 
 class LimeExplainer(object):
@@ -42,20 +43,20 @@ class LimeExplainer(object):
 
                 self.x_train = data
                 lime_tab_explainer = LimeTabularExplainer(self.x_train.values,
-                                                feature_names=self.x_train.columns,
-                                                class_names = self.class_names,
-                                                categorical_features=cat_features,
-                                                categorical_names=label_dic,
-                                                discretize_continuous=True,
-                                                sample_around_instance=True)
+                                                          feature_names=self.x_train.columns,
+                                                          class_names=self.class_names,
+                                                          categorical_features=cat_features,
+                                                          categorical_names=label_dic,
+                                                          discretize_continuous=True,
+                                                          sample_around_instance=True)
 
                 return lime_tab_explainer
             else:
                 lime_tab_explainer = LimeTabularExplainer(self.x_train.values,
-                                                feature_names=self.x_train.columns,
-                                                class_names = self.class_names,
-                                                discretize_continuous=True,
-                                                sample_around_instance=True)
+                                                          feature_names=self.x_train.columns,
+                                                          class_names=self.class_names,
+                                                          discretize_continuous=True,
+                                                          sample_around_instance=True)
                 return lime_tab_explainer
         except Exception as err:
             print('Error: model is not supported by LIME {} Explainer'.format(self.explainer_type))
@@ -63,7 +64,14 @@ class LimeExplainer(object):
             raise Exception(err)
 
     def get_instance_explanation(self, instance_ind, num_features=10):
-        if hasattr(self.model, 'predict_proba'):
+        def predict_fn(x):
+            label1 = self.model.predict(x)
+            label2 = 1 - label1
+            return np.hstack([label2, label1])
+
+        if str(type(self.model)) == "<class 'keras.engine.sequential.Sequential'>":
+            predict_f = predict_fn
+        elif hasattr(self.model, 'predict_proba'):
             predict_f = self.model.predict_proba
         elif hasattr(self.model, 'predict'):
             predict_f = self.model.predict
@@ -71,7 +79,7 @@ class LimeExplainer(object):
             raise AttributeError('Does not support model prediction function')
 
         exp = self.tabular_explainer.explain_instance(self.x_train.iloc[instance_ind], predict_f,
-                                                           num_features=num_features)
+                                                      num_features=num_features)
         return exp
 
     def show_lime_instance_explanation(self, instance_ind, num_features=10):
@@ -87,7 +95,7 @@ class LimeExplainer(object):
             os.makedirs('imgs', exist_ok=True)
         return exp.show_in_notebook(show_table=True, show_all=all)
 
-    def get_explanation_as_df(self, instance_ind=None, instance_interval=None):
+    def get_explanation_as_df(self, instance_ind=None, instance_interval=None, num_features=10):
         col_len = len(self.x_train.columns)
         df_exp = pd.DataFrame(columns=range(col_len))
         start = end = 0
@@ -98,8 +106,8 @@ class LimeExplainer(object):
             start = instance_interval[0]
             end = instance_interval[1]
 
-        for ind in range(start, end+1):
-            exp = self.get_instance_explanation(ind)
+        for ind in range(start, end + 1):
+            exp = self.get_instance_explanation(ind, num_features)
             exp_map = exp.as_map()[1]
             col_explanation = {k: v for k, v in exp_map}
             explanations = {}

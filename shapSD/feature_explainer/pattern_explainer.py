@@ -30,7 +30,7 @@ class PatternExplainer(object):
         self.local_exp = local_exp
         self.effect_name = None
 
-    def calc_local_feature_influence(self, method='SHAP'):
+    def calc_local_feature_influence(self, method='SHAP', shap_explainer_type='Tree'):
         if method == 'binary':
             df_flip_effect = self.local_exp.binary_flip_explanation(self.attr)
             df_flip = self.x_origin.copy()
@@ -53,7 +53,7 @@ class PatternExplainer(object):
             df_lime[self.effect_name] = df_lime_effect[self.attr]
             return df_lime
         if method == 'SHAP':
-            df_shap_effect = self.local_exp.shap_values_with_attr(self.attr)
+            df_shap_effect = self.local_exp.shap_values_with_attr(self.attr, explainer_type=shap_explainer_type)
             df_shap = self.x_origin.copy()
             # df_shap.reset_index(drop=True, inplace=True)
             self.effect_name = df_shap_effect.columns.tolist()[-1]

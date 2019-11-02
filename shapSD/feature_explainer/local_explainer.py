@@ -105,7 +105,7 @@ class LocalExplainer(object):
         return text_explanation_with_lime(self.x_train, instance_ind, self.model, class_name=class_names)
 
     def lime_explanation_as_df(self, instance_ind=None, instance_interval=None,
-                               explainer_type='tabular', class_names=None):
+                               explainer_type='tabular', class_names=None, num_features=10):
         """
         Local feature influence for the selected instances, encapsulated in a dataframe
         :param instance_ind: int, the selected instance to be explained
@@ -113,10 +113,12 @@ class LocalExplainer(object):
         :param explainer_type: str, by default only the tabular data is supported, but 
                                 it can be extended to image data
         :param class_names: list, the labels for the target to show in the plot
+        :param num_features: int, the number of features to be used in the local linear model, by default is 10
         :return: a dataframe which contains feature influence for chosen instances, measured by LIME
         """
         explainer = LimeExplainer(self.x_train, self.model, explainer_type=explainer_type, class_names=class_names)
-        return explainer.get_explanation_as_df(instance_ind, instance_interval)
+        return explainer.get_explanation_as_df(instance_ind=instance_ind, instance_interval=instance_interval,
+                                               num_features=num_features)
 
     def binary_flip_explanation(self, flip_attr, has_direction=False, instance_ind=None):
         """

@@ -41,11 +41,12 @@ class GlobalExplainer(object):
         feature_imp = FeatureImportance(self.x_train, self.y_train, self.model)
         return feature_imp.eli5_weights_importance(show=['feature_importances', 'target', 'description'])
 
-    def shap_feature_importance(self):
+    def shap_feature_importance(self, explainer_type='Tree', background_sample=500):
         """
         Global variable influence measured by SHAP feature importance (average absolute marginal
         effect of each feature)
         :return: a summary plot visualized using SHAP
         """
-        tree_shap = ShapExplainer(self.x_train, self.model, explainer_type='Tree')
+        tree_shap = ShapExplainer(self.x_train, self.model, explainer_type=explainer_type,
+                                  background_sample=background_sample)
         return tree_shap.shap_summary_plot(plot_type='bar')

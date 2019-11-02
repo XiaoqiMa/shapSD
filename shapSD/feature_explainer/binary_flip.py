@@ -17,7 +17,10 @@ class BinaryFlip(object):
     def get_prediction(self, x_train):
         try:
             predictions = self.model.predict_proba(x_train)  # classification task
-            return predictions[:, 1]  # probability of label=1
+            if predictions.shape[1] == 1:
+                return predictions
+            else:
+                return predictions[:, 1]  # probability of label=1
         except AttributeError:
             predictions = self.model.predict(x_train)  # regression task
             return predictions
