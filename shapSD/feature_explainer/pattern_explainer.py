@@ -17,11 +17,6 @@ class PatternExplainer(object):
         :param attribute: the selected feature to be inspected
         :param model: the underlying black-box model to be interpreted
         :param local_exp: the local explainer
-        :param method: the method applied to estimate the local feature influence
-                    'SHAP': by default, using the KernelSHAP method
-                    'LIME': using the LIME method (very slow)
-                    'binary': using the binary flip method, only for binary features
-                    'numeric': using the numeric perturb method, only for numeric features
         """
         self.x_origin = x_origin
         self.x_train = x_train
@@ -60,7 +55,7 @@ class PatternExplainer(object):
             df_shap[self.effect_name] = df_shap_effect[self.effect_name]
             return df_shap
 
-    def subgroup_discovery(self, df_effect, measure=GAStandardQFNumeric(0.8), ignore_labels=[], inverse_effect=False,
+    def subgroup_discovery(self, df_effect, measure=GAStandardQFNumeric(0.5), ignore_labels=[], inverse_effect=False,
                            statistic_is_positive=True):
         target = NumericTarget(self.effect_name)
         ignore_labels.extend([self.effect_name, self.attr])
