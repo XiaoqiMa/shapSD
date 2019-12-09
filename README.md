@@ -27,7 +27,7 @@
 - **Local methods** + **Pattern Mining**
 
 
-### ShapSD Usage
+### ShapSD Demonstration
 
 - **Tabular Data**:
 
@@ -35,7 +35,7 @@
 
 [Comparison of decision tree and subgroup discovery](https://github.com/XiaoqiMa/shapSD/blob/master/doc/02-Comparison%20between%20decision%20tree%20and%20subgroup%20discovery.ipynb)
 
-- **Text Data**:
+- **Textual Data**:
 
 [Case study: Amazon Review](https://github.com/XiaoqiMa/shapSD/blob/master/doc/05-Amazon%20review%20explanation.ipynb)
 
@@ -44,6 +44,7 @@
 - **Neural Networks**:
 
 [Multilayer Perceptron](https://github.com/XiaoqiMa/shapSD/blob/master/doc/04-Case%20Study%20Adult%20dataset-keras_neural_network.ipynb)
+
 [LSTM](https://github.com/XiaoqiMa/shapSD/blob/master/doc/07-Neural%20Networks.ipynb)
 
 
