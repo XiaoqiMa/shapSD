@@ -46,6 +46,7 @@ class BinaryFlip(object):
 
     def calc_flip_effect(self, reverse_direction=False):
         flip_dic = {}
+        assert (len(self.x_train[self.flip_attr].unique()) == 2)
         attr_val1, attr_val2 = self.x_train[self.flip_attr].unique()
         flip_dic[attr_val1] = attr_val2
         flip_dic[attr_val2] = attr_val1

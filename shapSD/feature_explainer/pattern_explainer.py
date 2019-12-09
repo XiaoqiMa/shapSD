@@ -55,12 +55,16 @@ class PatternExplainer(object):
             df_shap[self.effect_name] = df_shap_effect[self.effect_name]
             return df_shap
 
-    def subgroup_discovery(self, df_effect, measure=GAStandardQFNumeric(0.5), ignore_labels=[], inverse_effect=False,
+    def subgroup_discovery(self, df_effect, measure=GAStandardQFNumeric(0.5), result_set_size=10, ignore_labels=None,
+                           inverse_effect=False,
                            statistic_is_positive=True):
         target = NumericTarget(self.effect_name)
-        ignore_labels.extend([self.effect_name, self.attr])
+        if isinstance(ignore_labels, list):
+            ignore_labels.extend([self.effect_name, self.attr])
+        else:
+            ignore_labels = [self.effect_name, self.attr]
         search_space = create_selectors(df_effect, nbins=10, ignore=ignore_labels)
-        task = SubgroupDiscoveryTask(df_effect, target, search_space, qf=measure, result_set_size=10)
+        task = SubgroupDiscoveryTask(df_effect, target, search_space, qf=measure, result_set_size=result_set_size)
         result = BeamSearch().execute(task, inverse_effect, statistic_is_positive)
         df_result = as_df(df_effect, result, statistics_to_show=all_statistics_numeric)
         return df_result[['quality', 'subgroup', 'size_sg', 'mean_sg', 'mean_dataset', 'mean_lift']]
