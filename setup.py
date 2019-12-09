@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='shapSD',
-    version='0.3.0',
+    version='0.3.1',
     packages=['shapSD', 'shapSD.feature_explainer', 'shapSD.pysubgroup'],
     package_dir={'shapSD': 'shapSD', 'shapSD.feature_explainer': 'shapSD/feature_explainer',
                  'shapSD.pysubgroup': 'shapSD/pysubgroup'},

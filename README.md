@@ -1,6 +1,6 @@
 ## shapSD
 
-**shapSD** is an interpretable framework that enables to inspect variable influence in black box models through pattern mining. Despite the global interpretation and local interpretation, this framework provides a "pattern level" interpretation, which combines the local interpretation methods and the subgroup discovery technique. 
+**shapSD** is an interpretable framework that enables to inspect variable influence in black box models through pattern mining. Despite the global interpretation and local interpretation, this framework provides a meso-level interpretation, which combines the local interpretation methods and the subgroup discovery technique. 
 
 ### Global Interpretation methods
 
@@ -22,19 +22,16 @@
 - **Kernel SHAP**
     - combination of linear LIME and shapley values to get an explanation model
 
-### Subgroup Discovery technique
+### Meso-level Interpretatoin methods
 
-Subgroup Discovery is a well established data mining technique that allows you to identify patterns in your data. The goal of subgroup discovery is to identify descriptions of data subsets that show an interesting distribution with respect to a pre-specified target concept.
-
+- **Local methods** + **Pattern Mining**
 
 
 ### ShapSD Usage
 
 - **Tabular Data**:
 
-[Case study: Breast Cancer](https://github.com/XiaoqiMa/shapSD/blob/master/doc/03-Case%20Study%20Breast%20Cancer%20dataset.ipynb)
-
-[Case study: Adult Income](https://github.com/XiaoqiMa/shapSD/blob/master/doc/04-Case%20Study%20Adult%20dataset.ipynb)
+[Case study: Adult Income](https://github.com/XiaoqiMa/shapSD/blob/master/doc/03-Case%20Study%20Adult%20dataset-boosting_tree_model.ipynb)
 
 [Comparison of decision tree and subgroup discovery](https://github.com/XiaoqiMa/shapSD/blob/master/doc/02-Comparison%20between%20decision%20tree%20and%20subgroup%20discovery.ipynb)
 
@@ -46,7 +43,8 @@ Subgroup Discovery is a well established data mining technique that allows you t
 
 - **Neural Networks**:
 
-[Case study: Review sentiment](https://github.com/XiaoqiMa/shapSD/blob/master/doc/07-Neural%20Networks.ipynb)
+[Multilayer Perceptron](https://github.com/XiaoqiMa/shapSD/blob/master/doc/04-Case%20Study%20Adult%20dataset-keras_neural_network.ipynb)
+[LSTM](https://github.com/XiaoqiMa/shapSD/blob/master/doc/07-Neural%20Networks.ipynb)
 
 
 **The MIT License (MIT)**
